@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import AuthContext from '../context/authContext';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
+  const { login } = useContext(AuthContext);
 
   //e is an event object
   const handleLogin = async (e: React.FormEvent) => {
@@ -23,6 +25,7 @@ const Login = () => {
       if (response.ok) {
         const data = await response.json();
         localStorage.setItem('token', data.token); // Save token for future requests
+        login();
         navigate('/'); // Redirect to homepage after successful login
       } else {
         alert('Login failed!');
