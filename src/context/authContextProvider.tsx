@@ -5,6 +5,7 @@ export const AuthProvider = ({
     children
 }: {children: ReactNode}) => {
     const [auth, setAuth] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(true);
 
     const login = () => setAuth(true);
     
@@ -18,10 +19,11 @@ export const AuthProvider = ({
         if (token) {
             setAuth(true);
         }
+        setLoading(false);
     }, [])
 
     return (
-        <AuthContext.Provider value={{ auth, login, logout}}>
+        <AuthContext.Provider value={{ auth, loading, login, logout}}>
             {children}
         </AuthContext.Provider>
     )

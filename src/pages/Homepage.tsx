@@ -2,7 +2,12 @@ import { useContext } from 'react';
 import AuthContext from "../context/authContext";
 
 const Homepage = () => {
-    const { auth } = useContext(AuthContext);
+    const { auth, loading } = useContext(AuthContext);
+
+    //will display this if the authentication data is still propagating
+    if (loading) {
+      return <div>Loading...</div>;
+    }
 
   return (
     <div>
