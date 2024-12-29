@@ -1,6 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AuthContext from '../context/authContext';
+import { loginUser } from '../services/authServices';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -8,30 +9,17 @@ const Login = () => {
   const navigate = useNavigate();
   const { login } = useContext(AuthContext);
 
-  //e is an event object
   const handleLogin = async (e: React.FormEvent) => {
-    //this prevents the page from reloading upon submission
     e.preventDefault();
 
     try {
-      const response = await fetch('http://localhost:3001/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        localStorage.setItem('token', data.token); // Save token for future requests
-        login();
-        navigate('/'); // Redirect to homepage after successful login
-      } else {
-        alert('Login failed!');
-      }
-    } catch {
-      alert('An error occurred. Please try again.');
+      const { token } = await loginUser(email, password);
+      localStorage.setItem('token', token);
+      login();
+      navigate('/');
+    } catch (error) {
+      console.error(error);
+      alert('Login failed!');
     }
   };
 

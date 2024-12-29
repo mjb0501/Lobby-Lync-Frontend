@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { registerUser } from '../services/authServices';
 
 const Register = () => {
     const [username, setUsername] = useState<string>('');
@@ -8,25 +9,15 @@ const Register = () => {
     const navigate = useNavigate();
 
     const handleRegister = async (e: React.FormEvent) => {
-        e.preventDefault();
-    
-        try {
-          const response = await fetch('http://localhost:3001/auth/register', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ username, email, password }),
-          });
-    
-          if (response.ok) {
-            navigate('/login');
-          } else {
-            alert('Registration failed!');
-          }
-        } catch {
-          alert('An error occurred. Please try again.');
-        }
+      e.preventDefault();
+  
+      try {
+        await registerUser(username, email, password);
+        navigate('/login');
+      } catch (error) {
+        console.error(error);
+        alert('Registration failed!');
+      }
     };
     
     return (
