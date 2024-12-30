@@ -1,6 +1,7 @@
 import { useContext, useEffect, useState } from 'react';
 import AuthContext from "../context/authContext";
 import { getPosts } from '../services/postServices';
+import { GameSearch } from '../components/gameSearchBar';
 
 interface Post {
   id: number;
@@ -46,7 +47,9 @@ const Homepage = () => {
       <h1>
         {auth ? 'Welcome to Your Dashboard!' : 'Welcome, please log in to continue.'}
       </h1>
-      
+
+      <GameSearch />
+
       {posts.length > 0 ? (
         <ul>
           {posts.map((post) => (
