@@ -2,7 +2,11 @@ import { useState } from 'react';
 import { autocompleteGames } from '../services/gameServices';
 import { useDebounce } from '../hooks/debounce';
 
-export const GameSearch = () => {
+interface GameSearchProps {
+    filterByGame: (game: string) => void;
+}
+
+export const GameSearch: React.FC<GameSearchProps> = ({filterByGame}) => {
     const [query, setQuery] = useState<string>('');
     const [games, setGames] = useState<string[]>([]);
 
@@ -28,6 +32,14 @@ export const GameSearch = () => {
         fetchGames();
     };
 
+    const handleGameClick = (game: string) => {
+        filterByGame(game);
+        //clears search bar
+        setQuery(''); 
+        //clears autocomplete results
+        setGames([]);
+    }
+
     return (
         <>
             <input
@@ -39,7 +51,9 @@ export const GameSearch = () => {
             {games.length > 0 && (
                 <ul>
                     {games.map((game, index) => (
-                        <li key={index}>{game}</li>
+                        <li key={index}>
+                            <button onClick={() => handleGameClick(game)}>{game}</button>
+                        </li>
                     ))}
                 </ul>
             )}

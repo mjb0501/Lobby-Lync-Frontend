@@ -13,34 +13,44 @@ interface Post {
 }
 
 const Homepage = () => {
-    const { auth } = useContext(AuthContext);
-    const [loading, setLoading] = useState<boolean>(true);
-    const [ posts, setPosts ] = useState<Post[]>([]);
-    const [error, setError] = useState<string | null>(null);
+  const { auth } = useContext(AuthContext);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [ posts, setPosts ] = useState<Post[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [currentFilter, setCurrentFilter] = useState<string | null>(null);
 
-    useEffect(() => {
-      const fetchPosts = async () => {
-          try 
-          {
-              const data = await getPosts();
-              setPosts(data);
-          } 
-          catch 
-          {
-              setError('Failed to load posts');
-          }
-          finally 
-          {
-            setLoading(false);
-          }
-      };
+  const fetchPosts = async (filter?: { gameName?: string }) => {
+    try 
+    {
+      //can call getPosts with either a filter or nothing
+      const data = await getPosts(filter || {});
+      setPosts(data);
+    } 
+    catch 
+    {
+      setError('Failed to load posts');
+    }
+    finally 
+    {
+      setLoading(false);
+    }
+  }
 
-      fetchPosts();
+  useEffect(() => {
+    fetchPosts();
   }, []);
 
-    //will display this if the authentication data is still propagating
-    if (loading) return <div>Loading...</div>;
-    if (error) return <div>{error}</div>
+  //This function is passed to the gameSearchBar to filter the posts on the homepage
+  const filterByGame = (game: string) => {
+    fetchPosts({ gameName: game});
+    setCurrentFilter(game);
+  }
+
+
+
+  //will display this if the authentication data is still propagating
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>{error}</div>
 
   return (
     <div>
@@ -48,7 +58,13 @@ const Homepage = () => {
         {auth ? 'Welcome to Your Dashboard!' : 'Welcome, please log in to continue.'}
       </h1>
 
-      <GameSearch />
+      <GameSearch filterByGame={filterByGame}/>
+
+      {currentFilter ? (
+        <p>Currently showing posts filtered by: <strong>{currentFilter}</strong></p>
+      ) : (
+        <p>Showing all posts</p>
+      )}
 
       {posts.length > 0 ? (
         <ul>
