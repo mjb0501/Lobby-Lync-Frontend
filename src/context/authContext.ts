@@ -1,5 +1,6 @@
 import { createContext } from 'react';
 
+//specifies the context type to be shared with components that require the authorization context
 interface AuthContextType {
     auth: boolean
     loading: boolean

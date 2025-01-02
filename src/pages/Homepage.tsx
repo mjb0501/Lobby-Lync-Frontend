@@ -8,17 +8,23 @@ interface Post {
   description: string;
   createdAt: string;
   user: string;
-  platform: string;
+  platforms: string[];
   game: string;
 }
 
 const Homepage = () => {
+  //used to check whether user is logged in
   const { auth } = useContext(AuthContext);
+  //used to prevent the user from seeing incorrect content before authorization has been propagated
   const [loading, setLoading] = useState<boolean>(true);
+  //used to hold the array of posts to be shown on the home page
   const [ posts, setPosts ] = useState<Post[]>([]);
+  //MAY WANT TO REMOVE, used to hold the error occurring
   const [error, setError] = useState<string | null>(null);
+  //used to specify which filters have been applied to the posts
   const [currentFilter, setCurrentFilter] = useState<string | null>(null);
 
+  //will try and fetch the posts, can also be provided a game name to filter the results
   const fetchPosts = async (filter?: { gameName?: string }) => {
     try 
     {
@@ -36,6 +42,7 @@ const Homepage = () => {
     }
   }
 
+  //on loading website fetch the posts
   useEffect(() => {
     fetchPosts();
   }, []);
@@ -59,7 +66,7 @@ const Homepage = () => {
       </h1>
 
       <GameSearch filterByGame={filterByGame}/>
-
+      {/* NEED TO IMPLEMENT WAY TO REMOVE FILTER */}
       {currentFilter ? (
         <p>Currently showing posts filtered by: <strong>{currentFilter}</strong></p>
       ) : (
@@ -72,8 +79,9 @@ const Homepage = () => {
             <li key={post.id}>
               <h2>{post.description}</h2>
               <p><strong>User:</strong> {post.user}</p>
-              <p><strong>Platform:</strong> {post.platform}</p>
+              <p><strong>Platform:</strong> {post.platforms.join(', ')}</p>
               <p><strong>Game:</strong> {post.game}</p>
+              <p><strong>Description:</strong> {post.description}</p>
               <p><strong>Posted At:</strong> {new Date(post.createdAt).toLocaleString()}</p>
             </li>
           ))}

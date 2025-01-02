@@ -1,6 +1,7 @@
 import { useState, ReactNode, useEffect } from 'react';
 import { AuthContext } from './authContext';
 
+//Context provider for the entire website that propagates whether a user is logged in or not
 export const AuthProvider = ({
     children
 }: {children: ReactNode}) => {

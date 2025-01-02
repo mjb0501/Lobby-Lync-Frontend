@@ -11,3 +11,13 @@ export const getPosts = async (params: { gameName?: string } = {}) => {
         throw error;
     }
 };
+
+export const createPost = async (postData: { platformIds: string[], gameId: number, description: string}) => {
+    try {
+        const response = await axios.post(`${API_URL}/posts/createPost`, postData);
+        return response.data
+    } catch (error) {
+        console.error('Error creating post: ', error);
+        throw error;
+    }
+};

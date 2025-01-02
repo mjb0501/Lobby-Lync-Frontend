@@ -5,6 +5,7 @@ import { AuthContext } from './context/authContext.ts'
 import Homepage from './pages/Homepage.tsx';
 import Register from './pages/Register.tsx';
 import Login from './pages/Login.tsx';
+import CreatePost from './pages/CreatePost.tsx';
 
 import './App.css'
 
@@ -17,6 +18,7 @@ function App() {
           <Route path="/" element={<Homepage />} />
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} /> 
+          <Route path="/createPost" element={<CreatePost />} />
         </Routes>
       </Router>
     </AuthProvider>
@@ -36,6 +38,7 @@ const NavBar = () => {
         </>
       ) : (
         <>
+          <Link to="/createPost">Create Post</Link>
           <button onClick={logout}>Logout</button>
         </>
       )}

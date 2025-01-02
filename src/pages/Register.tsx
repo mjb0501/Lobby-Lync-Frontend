@@ -8,6 +8,8 @@ const Register = () => {
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
 
+    //will register a user based on the provided credentials
+    //NEED MORE COMPREHENSIVE ERROR MESSAGES WHEN FAILED REGISTRATION
     const handleRegister = async (e: React.FormEvent) => {
       e.preventDefault();
   

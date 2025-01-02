@@ -26,12 +26,14 @@ export const GameSearch: React.FC<GameSearchProps> = ({filterByGame}) => {
         }
     });
 
+    //when a change is detected call the autocomplete function with the new updated query
     const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const searchQuery = e.target.value;
         setQuery(searchQuery);
         fetchGames();
     };
 
+    //when a game from the autocomplete is chosen call the provided filter function
     const handleGameClick = (game: string) => {
         filterByGame(game);
         //clears search bar
@@ -40,6 +42,8 @@ export const GameSearch: React.FC<GameSearchProps> = ({filterByGame}) => {
         setGames([]);
     }
 
+    /*returns a text input and if a fetch is made a list of buttons for each game 
+    that when pressed calls the provided function (should filter a list of posts)*/
     return (
         <>
             <input
