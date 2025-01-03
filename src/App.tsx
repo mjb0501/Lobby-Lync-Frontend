@@ -1,5 +1,6 @@
 import { useContext } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import axios from 'axios';
 import { AuthProvider } from './context/authContextProvider.tsx';
 import { AuthContext } from './context/authContext.ts'
 import Homepage from './pages/Homepage.tsx';
@@ -8,6 +9,9 @@ import Login from './pages/Login.tsx';
 import CreatePost from './pages/CreatePost.tsx';
 
 import './App.css'
+
+axios.defaults.baseURL = 'http://localhost:3001';
+axios.defaults.withCredentials = true;
 
 function App() {
   return (

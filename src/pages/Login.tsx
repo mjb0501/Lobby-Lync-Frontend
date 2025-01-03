@@ -16,9 +16,8 @@ const Login = () => {
     e.preventDefault();
 
     try {
-      const { token } = await loginUser(email, password);
-      localStorage.setItem('token', token);
-      axios.defaults.headers['Authorization'] = `Bearer ${token}`
+      await loginUser(email, password);
+      axios.defaults.withCredentials = true;
       login();
       navigate('/');
     } catch (error) {

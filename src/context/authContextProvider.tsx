@@ -1,5 +1,6 @@
 import { useState, ReactNode, useEffect } from 'react';
 import { AuthContext } from './authContext';
+import { checkAuth, logoutUser } from '../services/authServices';
 
 //Context provider for the entire website that propagates whether a user is logged in or not
 export const AuthProvider = ({
@@ -11,16 +12,27 @@ export const AuthProvider = ({
     const login = () => setAuth(true);
     
     const logout = () => {
-        localStorage.removeItem('token');
-        setAuth(false);
+        try {
+            logoutUser();
+            setAuth(false);
+        } catch (error) {
+            console.error('Logout failed', error);
+        }
     }
 
     useEffect(() => {
-        const token = localStorage.getItem('token');
-        if (token) {
-            setAuth(true);
-        }
-        setLoading(false);
+        const checkAuthorization = async () => {
+            try {
+                const response = await checkAuth();
+                setAuth(response.loggedIn);
+            } catch {
+                setAuth(false);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        checkAuthorization();
     }, [])
 
     return (

@@ -53,6 +53,11 @@ const Homepage = () => {
     setCurrentFilter(game);
   }
 
+  const removeGameFilter = () => {
+    setCurrentFilter(null);
+    fetchPosts();
+  }
+
 
 
   //will display this if the authentication data is still propagating
@@ -68,9 +73,12 @@ const Homepage = () => {
       <GameSearch filterByGame={filterByGame}/>
       {/* NEED TO IMPLEMENT WAY TO REMOVE FILTER */}
       {currentFilter ? (
-        <p>Currently showing posts filtered by: <strong>{currentFilter}</strong></p>
+        <>
+          <p>Currently showing posts filtered by: <strong>{currentFilter}</strong></p>
+          <button onClick={removeGameFilter}>Remove Filter</button>
+        </>
       ) : (
-        <p>Showing all posts</p>
+        <></>
       )}
 
       {posts.length > 0 ? (

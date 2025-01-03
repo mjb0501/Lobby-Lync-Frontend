@@ -1,10 +1,8 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:3001'; // Replace with your backend URL
-
 export const getPosts = async (params: { gameName?: string } = {}) => {
     try {
-        const response = await axios.get(`${API_URL}/posts/getPosts`, { params });
+        const response = await axios.get(`/posts/getPosts`, { params });
         return response.data;
     } catch (error) {
         console.error('Error fetching posts:', error);
@@ -14,7 +12,7 @@ export const getPosts = async (params: { gameName?: string } = {}) => {
 
 export const createPost = async (postData: { platformIds: string[], gameId: number, description: string}) => {
     try {
-        const response = await axios.post(`${API_URL}/posts/createPost`, postData);
+        const response = await axios.post(`/posts/createPost`, postData);
         return response.data
     } catch (error) {
         console.error('Error creating post: ', error);
