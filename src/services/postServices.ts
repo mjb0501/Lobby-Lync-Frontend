@@ -19,3 +19,13 @@ export const createPost = async (postData: { platformIds: string[], gameId: numb
         throw error;
     }
 };
+
+export const acceptPost = async (acceptData: {postId: number, description: string}) => {
+    try {
+        const response = await axios.post(`/posts/acceptPost`, acceptData);
+        return response.data
+    } catch (error) {
+        console.error('Error accepting post:', error);
+        throw error;
+    }
+}

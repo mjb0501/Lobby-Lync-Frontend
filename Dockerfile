@@ -1,4 +1,4 @@
-FROM node:latest as build
+FROM node:22.12.0-alpine as build
 
 WORKDIR /app/
 

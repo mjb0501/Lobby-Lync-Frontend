@@ -24,6 +24,7 @@ export const AuthProvider = ({
         const checkAuthorization = async () => {
             try {
                 const response = await checkAuth();
+                console.log("checking auth");
                 setAuth(response.loggedIn);
             } catch {
                 setAuth(false);

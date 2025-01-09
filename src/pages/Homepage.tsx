@@ -1,15 +1,16 @@
 import { useContext, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import AuthContext from "../context/authContext";
-import { getPosts } from '../services/postServices';
+import { getPosts, acceptPost } from '../services/postServices';
 import { GameSearch } from '../components/gameSearchBar';
 
 interface Post {
-  id: number;
+  postId: number;
+  user: string;
+  game: string;
   description: string;
   createdAt: string;
-  user: string;
   platforms: string[];
-  game: string;
 }
 
 const Homepage = () => {
@@ -23,6 +24,10 @@ const Homepage = () => {
   const [error, setError] = useState<string | null>(null);
   //used to specify which filters have been applied to the posts
   const [currentFilter, setCurrentFilter] = useState<string | null>(null);
+  const navigate = useNavigate();
+  const [showModal, setShowModal] = useState<boolean>(false);
+  const [description, setDescription] = useState<string>('');
+  const [postIdToAccept, setPostIdToAccept] = useState<number>(-1);
 
   //will try and fetch the posts, can also be provided a game name to filter the results
   const fetchPosts = async (filter?: { gameName?: string }) => {
@@ -58,6 +63,42 @@ const Homepage = () => {
     fetchPosts();
   }
 
+  const handleAcceptPost = async (postId: number) => {
+    if (!auth) {
+      navigate('/login');
+      return;
+    }
+
+    setPostIdToAccept(postId);
+    setShowModal(true);
+  }
+
+  const handleDescriptionChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setDescription(event.target.value);
+  };
+
+  const handleCancel = () => {
+    setDescription('');
+    setShowModal(false);
+  }
+
+  const handleSubmitAcceptance = async () => {
+    try {
+      const acceptData = {
+        postId: postIdToAccept,
+        description: description,
+      };
+
+      await acceptPost(acceptData);
+      alert('Post accepted successfully!');
+      setShowModal(false);
+      setDescription('');
+    } catch (error) {
+      console.error('Error accepting post:', error);
+      alert('Failed to accept post.');
+    }
+  };
+
 
 
   //will display this if the authentication data is still propagating
@@ -84,19 +125,39 @@ const Homepage = () => {
       {posts.length > 0 ? (
         <ul>
           {posts.map((post) => (
-            <li key={post.id}>
+            <li key={post.postId}>
               <h2>{post.description}</h2>
               <p><strong>User:</strong> {post.user}</p>
               <p><strong>Platform:</strong> {post.platforms.join(', ')}</p>
               <p><strong>Game:</strong> {post.game}</p>
               <p><strong>Description:</strong> {post.description}</p>
               <p><strong>Posted At:</strong> {new Date(post.createdAt).toLocaleString()}</p>
+              <button onClick={() => handleAcceptPost(post.postId)}>Accept Post</button>
             </li>
           ))}
         </ul>
       ) : (
         <p>No posts currently exist.</p>
       )}
+
+      {/* Modal for accepting the post and adding a description */}
+      {showModal && (
+        <div className="modal">
+          <div className="modal-content">
+            <h3>Accept Post</h3>
+            <p>Provide a description for your acceptance:</p>
+            <input
+              type="text"
+              value={description}
+              onChange={handleDescriptionChange}
+              placeholder="Enter your description"
+            />
+            <button onClick={handleSubmitAcceptance}>Submit</button>
+            <button onClick={handleCancel}>Cancel</button>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };

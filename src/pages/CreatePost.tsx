@@ -56,6 +56,7 @@ const CreatePost = () => {
         setError(null);
 
         try {
+            console.log(postData);
             const response = createPost(postData);
             console.log('Post created successfully:', response);
 

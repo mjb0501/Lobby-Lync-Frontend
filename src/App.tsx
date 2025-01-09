@@ -10,7 +10,7 @@ import CreatePost from './pages/CreatePost.tsx';
 
 import './App.css'
 
-axios.defaults.baseURL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
+axios.defaults.baseURL = 'http://localhost:3001';
 axios.defaults.withCredentials = true;
 
 function App() {
