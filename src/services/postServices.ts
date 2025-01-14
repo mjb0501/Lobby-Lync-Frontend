@@ -29,3 +29,13 @@ export const acceptPost = async (acceptData: {postId: number, description: strin
         throw error;
     }
 }
+
+export const getYourPost = async () => {
+    try {
+        const response = await axios.get(`/posts/getPostById`);
+        return response.data
+    } catch (error) {
+        console.error('Error fetching post by id:', error);
+        throw error;
+    }
+}

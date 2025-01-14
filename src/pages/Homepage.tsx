@@ -31,18 +31,13 @@ const Homepage = () => {
 
   //will try and fetch the posts, can also be provided a game name to filter the results
   const fetchPosts = async (filter?: { gameName?: string }) => {
-    try 
-    {
+    try {
       //can call getPosts with either a filter or nothing
       const data = await getPosts(filter || {});
       setPosts(data);
-    } 
-    catch 
-    {
+    } catch {
       setError('Failed to load posts');
-    }
-    finally 
-    {
+    } finally {
       setLoading(false);
     }
   }

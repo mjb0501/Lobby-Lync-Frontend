@@ -7,6 +7,7 @@ import Homepage from './pages/Homepage.tsx';
 import Register from './pages/Register.tsx';
 import Login from './pages/Login.tsx';
 import CreatePost from './pages/CreatePost.tsx';
+import YourPost from './pages/YourPost.tsx';
 
 import './App.css'
 
@@ -23,6 +24,7 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} /> 
           <Route path="/createPost" element={<CreatePost />} />
+          <Route path="/yourPost" element={<YourPost />} />
         </Routes>
       </Router>
     </AuthProvider>
@@ -43,6 +45,7 @@ const NavBar = () => {
       ) : (
         <>
           <Link to="/createPost">Create Post</Link>
+          <Link to="/yourPost">Your Post</Link>
           <button onClick={logout}>Logout</button>
         </>
       )}
