@@ -1,5 +1,5 @@
 import { useState, useContext } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import AuthContext from '../context/authContext';
 import { GameSearch } from '../components/gameSearchBar';
 import { gamePlatforms, gamePlatformsData } from '../services/gameServices';
@@ -14,7 +14,8 @@ const CreatePost = () => {
     const [description, setDescription] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
-    const allPlatforms = ['Xbox', 'Playstation', 'PC', 'Switch'];   
+    const allPlatforms = ['Xbox', 'Playstation', 'PC', 'Switch'];
+    const navigate = useNavigate();
 
     const chooseGame = async (game: string) => {
         setGameName(game);
@@ -65,6 +66,7 @@ const CreatePost = () => {
             setPlatforms([]);
             setSelectedPlatforms([]);
             setDescription('');
+            navigate('/yourPost');
         } catch {
             setError('Failed to create post. Please try again later.');
         } finally {

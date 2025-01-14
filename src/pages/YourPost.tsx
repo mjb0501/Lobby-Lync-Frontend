@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getYourPost } from "../services/postServices";
+import { getYourPost, deletePost } from "../services/postServices";
 
 interface Post {
     postId: number;
@@ -14,18 +14,32 @@ const YourPost = () => {
     const [post, setPost] = useState<Post | null>(null);
     const [error, setError] = useState<string>('');
     
-    useEffect(() => {
-        const fetchYourPost = async () => {
-            try {
-                const response = await getYourPost();
+    const fetchYourPost = async () => {
+        try {
+            const response = await getYourPost();
+            if (response) {
                 setPost(response);
-            } catch {
+            } else {
                 setError('We failed to find any posts uploaded by you');
             }
-        };
+        } catch {
+            setError('We failed to find any posts uploaded by you');
+        }
+    };
 
+    useEffect(() => {
         fetchYourPost();
     }, []);
+
+    const handleDelete = async () => {
+        try {
+            await deletePost();
+            setPost(null);
+            fetchYourPost();
+        } catch {
+            alert('Failed to delete post.');
+        }
+    }
 
     return (
         <div>
@@ -38,6 +52,7 @@ const YourPost = () => {
                     <p><strong>Game:</strong> {post.game}</p>
                     <p><strong>Description:</strong> {post.description}</p>
                     <p><strong>Posted At:</strong> {new Date(post.createdAt).toLocaleString()}</p>
+                    <button onClick={handleDelete}>Delete Post</button>
                 </div>
             : <div>{error}</div>}
         </div>

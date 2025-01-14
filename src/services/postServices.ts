@@ -39,3 +39,12 @@ export const getYourPost = async () => {
         throw error;
     }
 }
+
+export const deletePost = async () => {
+    try {
+        await axios.get('/posts/deletePost');
+    } catch (error) {
+        console.error('Error deleting post:', error);
+        throw error;
+    }
+}
