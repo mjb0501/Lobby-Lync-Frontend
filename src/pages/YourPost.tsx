@@ -1,6 +1,11 @@
 import { useEffect, useState } from "react";
 import { getYourPost, deletePost } from "../services/postServices";
 
+interface Acceptance {
+    username: string;
+    description: string;
+}
+
 interface Post {
     postId: number;
     user: string;
@@ -8,6 +13,7 @@ interface Post {
     description: string;
     createdAt: string;
     platforms: string[];
+    acceptances: Acceptance[];
   }
 
 const YourPost = () => {
@@ -47,12 +53,20 @@ const YourPost = () => {
                 <div>
                     <h1>Your Post</h1>
                     <h2>{post.description}</h2>
-                    <p><strong>User:</strong> {post.user}</p>
                     <p><strong>Platform:</strong> {post.platforms.join(', ')}</p>
                     <p><strong>Game:</strong> {post.game}</p>
                     <p><strong>Description:</strong> {post.description}</p>
                     <p><strong>Posted At:</strong> {new Date(post.createdAt).toLocaleString()}</p>
                     <button onClick={handleDelete}>Delete Post</button>
+                    <h2>Post Acceptances</h2>
+                    <ul>
+                        {post.acceptances.map((acceptance) => (
+                            <li key={acceptance.username}>
+                                <p><strong>Username:</strong> {acceptance.username}</p>
+                                <p><strong>Description:</strong> {acceptance.description}</p>
+                            </li>
+                        ))}
+                    </ul>
                 </div>
             : <div>{error}</div>}
         </div>
