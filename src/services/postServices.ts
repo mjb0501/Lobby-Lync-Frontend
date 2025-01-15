@@ -14,7 +14,7 @@ export const createPost = async (postData: { platformIds: string[], gameId: numb
     try {
         const response = await axios.post(`/posts/createPost`, postData);
         return response.data
-    } catch (error) {
+    } catch (error: unknown) {
         console.error('Error creating post: ', error);
         throw error;
     }

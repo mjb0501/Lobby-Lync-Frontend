@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import AuthContext from '../context/authContext';
 import { GameSearch } from '../components/gameSearchBar';
 import { gamePlatforms, gamePlatformsData } from '../services/gameServices';
-import { createPost } from '../services/postServices';
+import { createPost, deletePost } from '../services/postServices';
 
 const CreatePost = () => {
     const { auth } = useContext(AuthContext);
@@ -44,7 +44,7 @@ const CreatePost = () => {
         }
     };
 
-    const handleSubmit = (event: React.FormEvent) => {
+    const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
 
         const postData = {
@@ -57,8 +57,26 @@ const CreatePost = () => {
         setError(null);
 
         try {
-            console.log(postData);
-            const response = createPost(postData);
+            let response = await createPost(postData);
+
+            //if a response is already uploaded then prompt to replace with new post
+            if (!response.postId) {
+                const confirmation = window.confirm("You are only allowed to upload one post at a time.  Click ok if you would like to delete that post and upload this one instead.  Click cancel if you want to leave that other post up.");
+                if (confirmation) {
+                    try {
+                        await deletePost();
+                        console.log(postData);
+                        response = await createPost(postData);
+                    } catch (error) {
+                        console.error("Error while deleting and uploading new post:", error);
+                        alert("Failed to delete and Upload new post.");
+                        return;
+                    }
+                } else {
+                    return;
+                }
+            }
+
             console.log('Post created successfully:', response);
 
             setGameName('');
