@@ -1,8 +1,7 @@
-import { useContext } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import axios from 'axios';
 import { AuthProvider } from './context/authContextProvider.tsx';
-import { AuthContext } from './context/authContext.ts'
+import { NavBar } from './components/navigationBar.tsx';
 import Homepage from './pages/Homepage.tsx';
 import Register from './pages/Register.tsx';
 import Login from './pages/Login.tsx';
@@ -29,28 +28,6 @@ function App() {
       </Router>
     </AuthProvider>
   );
-}
-
-const NavBar = () => {
-  const { auth, logout } = useContext(AuthContext);
-
-  return (
-    <nav>
-      <Link to="/">Home</Link>
-      {!auth ? (
-        <>
-          <Link to="/login">Login</Link>
-          <Link to="/register">Register</Link>
-        </>
-      ) : (
-        <>
-          <Link to="/createPost">Create Post</Link>
-          <Link to="/yourPost">Your Post</Link>
-          <button onClick={logout}>Logout</button>
-        </>
-      )}
-    </nav>
-  )
 }
 
 export default App

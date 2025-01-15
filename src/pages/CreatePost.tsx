@@ -119,59 +119,83 @@ const CreatePost = () => {
     return (
         <>
             {auth ? (
-                <div>
+                <div className="min-h-screen bg-slate-600 text-white flex flex-col items-center py-8">
+                    {/* Game Search */}
                     <GameSearch filterByGame={chooseGame}/>
-                    <div>
-                        <h2>Select platforms for {post.gameName}</h2>
-                        {post.gameName && (<button onClick={clearGame}>Clear Game</button>)}
-                        <div>
+                    
+                    {/* Game and Platform Selection*/}
+                    <div className="w-full max-w-4xl mt-8 bg-slate-500 p-6 rounded-lg shadow-lg">
+                        <h2 className="text-xl font-semibold mb-4">Select Platforms for {post.gameName}</h2>
+                        {post.gameName && (
+                            <button 
+                                onClick={clearGame}
+                                className="text-m text-red-500 hover:text-red-700 font-semibold"
+                            >
+                                Clear Game
+                            </button>
+                        )}
+
+                        <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                             {allPlatforms.map((platform) => (
                                 <button
                                     key={platform}
-                                    style={{
-                                        backgroundColor: platforms.includes(platform) ? 'lightblue' : 'grey',
-                                        //disable button if not in platforms list
-                                        pointerEvents: platforms.includes(platform) ? 'auto' : 'none',
-                                    }}
+                                    onClick={() => togglePlatformSelection(platform)}
+                                    className={`w-full py-2 px-4 rounded-lg border transition-colors ${
+                                        platforms.includes(platform)
+                                            ? post.platforms.includes(platform) ? 'bg-green-600 text-white' : 'bg-blue-800'
+                                            : 'bg-gray-600 text-gray-300'
+                                    } ${
+                                        !platforms.includes(platform) ? 'cursor-not-allowed' : ''
+                                    }`}
                                     //disable button if platform is not associated with game
                                     disabled={!platforms.includes(platform)}
-                                    onClick={() => togglePlatformSelection(platform)}
+                                    
                                 >
                                     {platform} {post.platforms.includes(platform) && '✓'}
                                 </button>
                             ))}
                         </div>
-                        <div>
-                            <h3>Selected Platforms</h3>
+                        
+                        {/* Selected Platforms */}
+                        <div className="mt-4">
+                            <h3 className="text-lg font-semibold mb-2">Selected Platforms</h3>
                             <ul>
                                 {post.platforms.map(platform => (
                                     <li key={platform}>{platform}</li>
                                 ))}
                             </ul>
                         </div>
-                    </div>
-                    <div>
-                        <label htmlFor="description">Description</label>
+
+                        {/* Description Input */}
+                        <label htmlFor="description" className="block text-lg font-medium mb-2">Description</label>
                         <textarea
                             id="description"
                             value={post.description}
                             onChange={(e) => setPost((prevPost) => ({...prevPost, description: e.target.value,}))}
                             rows={6}
-                            cols={50}
                             placeholder="Enter your description here..."
-                            style={{ width: '100%', resize: 'vertical' }}
+                            className="w-full px-4 py-2 rounded-lg bg-slate-400 border border-slate-300 text-slate-100 placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         />
-                    </div>
-                    <div>
-                        <button onClick={handleSubmit} style={{ marginTop: '20px'}}>
-                            {loading ? 'Submitting...' : 'Submit Post'}
-                        </button>
-                        {error && <p style={{ color: 'red' }}>{error}</p>}
+
+                        {/* Submit Button */}
+                        <div className="mt-6">
+                            <button 
+                                onClick={handleSubmit} 
+                                className="py-2 px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-md focus:outline-none focus:ring-2 fodus:ring-blue-500"
+                            >
+                                {loading ? 'Submitting...' : 'Submit Post'}
+                            </button>
+                            {error && <p className="text-red-500 mt-2">{error}</p>}
+                        </div>
                     </div>
                 </div>
             ) : (
                 <h1>
-                    You need to be logged in to create a post.  Click <Link to="/login">Here</Link> to login.
+                    You need to be logged in to create a post.  Click{' '}
+                    <Link to="/login" className="text-blue-500 hover:text-blue-700">
+                        Here
+                    </Link>
+                    to login.
                 </h1>
             )}
         </>

@@ -101,53 +101,62 @@ const Homepage = () => {
   if (error) return <div>{error}</div>
 
   return (
-    <div>
-      <h1>
+    <div className='container mx-auto max-w-7xl'>
+      <h1 className='text-3xl font-bold mb-6 text-center'>
         {auth ? 'Welcome to Your Dashboard!' : 'Welcome, please log in to continue.'}
       </h1>
 
-      <GameSearch filterByGame={filterByGame}/>
-      {currentFilter ? (
-        <>
+      <div className='mb-4'>
+        <GameSearch filterByGame={filterByGame}/>
+      </div>
+      
+      {currentFilter && (
+        <div className='mb-4'>
           <p>Currently showing posts filtered by: <strong>{currentFilter}</strong></p>
-          <button onClick={removeGameFilter}>Remove Filter</button>
-        </>
-      ) : (
-        <></>
+          <button className="btn btn-secondary mt-2" onClick={removeGameFilter}>Remove Filter</button>
+        </div>
       )}
 
       {posts.length > 0 ? (
-        <ul>
+        <ul className='space-y-6'>
           {posts.map((post) => (
-            <li key={post.postId}>
-              <h2>{post.description}</h2>
+            <li key={post.postId} className="bg-slate-500 p-4 rounded-lg shadow">
+              <h2 className="text-xl font-bold mb-2">{post.description}</h2>
               <p><strong>User:</strong> {post.user}</p>
               <p><strong>Platform:</strong> {post.platforms.join(', ')}</p>
               <p><strong>Game:</strong> {post.game}</p>
               <p><strong>Description:</strong> {post.description}</p>
               <p><strong>Posted At:</strong> {new Date(post.createdAt).toLocaleString()}</p>
-              <button onClick={() => handleAcceptPost(post.postId)}>Accept Post</button>
+              <button
+                className="btn btn-primary mt-4"
+                onClick={() => handleAcceptPost(post.postId)}
+              >
+                  Accept Post
+              </button>
             </li>
           ))}
         </ul>
       ) : (
-        <p>No posts currently exist.</p>
+        <p className="text-center">No posts currently exist.</p>
       )}
 
       {/* Modal for accepting the post and adding a description */}
       {showModal && (
-        <div className="modal">
-          <div className="modal-content">
-            <h3>Accept Post</h3>
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-slate-500 p-6 rounded-lg">
+            <h3 className="text-2xl font-bold mb-4">Accept Post</h3>
             <p>Provide a description for your acceptance:</p>
             <input
               type="text"
+              className="w-full p-2 rounded border border-slate-200 bg-slate-300 text-black mt-2"
               value={description}
               onChange={handleDescriptionChange}
               placeholder="Enter your description"
             />
-            <button onClick={handleSubmitAcceptance}>Submit</button>
-            <button onClick={handleCancel}>Cancel</button>
+            <div className="mt-4 flex justify-end space-x-2">
+              <button className="btn btn-primary" onClick={handleSubmitAcceptance}>Submit</button>
+              <button className="btn btn-danger" onClick={handleCancel}>Cancel</button>
+            </div>
           </div>
         </div>
       )}
