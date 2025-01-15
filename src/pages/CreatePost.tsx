@@ -5,52 +5,78 @@ import { GameSearch } from '../components/gameSearchBar';
 import { gamePlatforms, gamePlatformsData } from '../services/gameServices';
 import { createPost, deletePost } from '../services/postServices';
 
+interface Post {
+    gameId: number;
+    gameName: string;
+    platforms: string[];
+    description: string;
+}
+
 const CreatePost = () => {
+    //Used to know if the user is logged in or not
     const { auth } = useContext(AuthContext);
-    const [gameName, setGameName] = useState<string>('');
-    const [gameId, setGameId] = useState<number>(-1);
+    //Represents the user's chosen post attributes
+    const [post, setPost] = useState<Post>({ gameId: -1, gameName: '', platforms: [], description: '' });
+    //Is set to the platforms available for the chosen game
     const [platforms, setPlatforms] = useState<string[]>([]);
-    const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([]);
-    const [description, setDescription] = useState<string>('');
+    //represents whether loading is happening or an error has occurred
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
+    //Used to map out all the buttons
     const allPlatforms = ['Xbox', 'Playstation', 'PC', 'Switch'];
     const navigate = useNavigate();
 
+    //Called when a user chooses a game, sets the proper atttributes in post
     const chooseGame = async (game: string) => {
-        setGameName(game);
         try {
             const response: gamePlatformsData = await gamePlatforms(game);
+            setPost((prevPost) => ({
+                ...prevPost,
+                gameId: response.gameId,
+                gameName: game,
+            }));
             setPlatforms(response.platforms);
-            setGameId(response.gameId);
         } catch (error) {
             console.error("Error fetching platforms: ", error)
         }
     };
 
+    //Called when the user clears their game choice, removes game and platform attributes from post
     const clearGame = () => {
-        setGameName('');
+        setPost((prevPost) => ({
+            ...prevPost,
+            gameId: -1,
+            gameName: '',
+            platforms: [],
+        }));
         setPlatforms([]);
-        setSelectedPlatforms([]);
     };
 
+    //Called when the user clicks a platform button, removes or adds the platform to the post attributes
     const togglePlatformSelection = (platform: string) => {
         /*if the button pressed is already included then remove it from the list of selected
             platforms otherwise add it to the list*/
-        if (selectedPlatforms.includes(platform)) {
-            setSelectedPlatforms(selectedPlatforms.filter(p => p !== platform));
+        if (post.platforms.includes(platform)) {
+            setPost((prevPost) => ({
+                ...prevPost,
+                platforms: prevPost.platforms.filter(p => p !== platform),
+            }))
         } else {
-            setSelectedPlatforms([...selectedPlatforms, platform])
+            setPost((prevPost) => ({
+                ...prevPost,
+                platforms: [...prevPost.platforms, platform],
+            }))
         }
     };
 
+    //Called when user submits post, takes care of calling the backend and transitioning to new page
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
 
         const postData = {
-            platformIds: selectedPlatforms,
-            gameId,
-            description,
+            platformIds: post.platforms,
+            gameId: post.gameId,
+            description: post.description,
         };
 
         setLoading(true);
@@ -79,11 +105,8 @@ const CreatePost = () => {
 
             console.log('Post created successfully:', response);
 
-            setGameName('');
-            setGameId(-1);
+            setPost({ gameId: -1, gameName: '', platforms: [], description: '' });
             setPlatforms([]);
-            setSelectedPlatforms([]);
-            setDescription('');
             navigate('/yourPost');
         } catch {
             setError('Failed to create post. Please try again later.');
@@ -99,8 +122,8 @@ const CreatePost = () => {
                 <div>
                     <GameSearch filterByGame={chooseGame}/>
                     <div>
-                        <h2>Select platforms for {gameName}</h2>
-                        {gameName && (<button onClick={clearGame}>Clear Game</button>)}
+                        <h2>Select platforms for {post.gameName}</h2>
+                        {post.gameName && (<button onClick={clearGame}>Clear Game</button>)}
                         <div>
                             {allPlatforms.map((platform) => (
                                 <button
@@ -114,14 +137,14 @@ const CreatePost = () => {
                                     disabled={!platforms.includes(platform)}
                                     onClick={() => togglePlatformSelection(platform)}
                                 >
-                                    {platform} {selectedPlatforms.includes(platform) && '✓'}
+                                    {platform} {post.platforms.includes(platform) && '✓'}
                                 </button>
                             ))}
                         </div>
                         <div>
                             <h3>Selected Platforms</h3>
                             <ul>
-                                {selectedPlatforms.map(platform => (
+                                {post.platforms.map(platform => (
                                     <li key={platform}>{platform}</li>
                                 ))}
                             </ul>
@@ -131,8 +154,8 @@ const CreatePost = () => {
                         <label htmlFor="description">Description</label>
                         <textarea
                             id="description"
-                            value={description}
-                            onChange={(e) => setDescription(e.target.value)}
+                            value={post.description}
+                            onChange={(e) => setPost((prevPost) => ({...prevPost, description: e.target.value,}))}
                             rows={6}
                             cols={50}
                             placeholder="Enter your description here..."

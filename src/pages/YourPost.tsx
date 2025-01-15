@@ -20,6 +20,7 @@ const YourPost = () => {
     const [post, setPost] = useState<Post | null>(null);
     const [error, setError] = useState<string>('');
     
+    //Fetches the user's post data
     const fetchYourPost = async () => {
         try {
             const response = await getYourPost();
@@ -33,10 +34,12 @@ const YourPost = () => {
         }
     };
 
+    //Calls fetch post on load
     useEffect(() => {
         fetchYourPost();
     }, []);
 
+    //Called when user clicks delete, calls backend to delete user's post
     const handleDelete = async () => {
         try {
             await deletePost();

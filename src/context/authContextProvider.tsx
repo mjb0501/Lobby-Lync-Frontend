@@ -15,6 +15,7 @@ export const AuthProvider = ({
         try {
             logoutUser();
             setAuth(false);
+            window.location.reload();
         } catch (error) {
             console.error('Logout failed', error);
         }

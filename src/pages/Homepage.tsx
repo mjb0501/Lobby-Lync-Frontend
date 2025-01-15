@@ -61,6 +61,7 @@ const Homepage = () => {
   const handleAcceptPost = async (postId: number) => {
     if (!auth) {
       navigate('/login');
+      alert("Need to be logged in to accept post.");
       return;
     }
 
@@ -73,7 +74,6 @@ const Homepage = () => {
   };
 
   const handleCancel = () => {
-    setDescription('');
     setShowModal(false);
   }
 
@@ -107,7 +107,6 @@ const Homepage = () => {
       </h1>
 
       <GameSearch filterByGame={filterByGame}/>
-      {/* NEED TO IMPLEMENT WAY TO REMOVE FILTER */}
       {currentFilter ? (
         <>
           <p>Currently showing posts filtered by: <strong>{currentFilter}</strong></p>
