@@ -16,20 +16,30 @@ export const registerUser = async (username: string, email: string, password: st
         await axios.post(`/auth/register`, { username, email, password });
     } catch (error) {
         console.error('Error registering user: ', error);
+        throw error;
     }
     
   };
 
-export const checkAuth = async (): Promise<{ loggedIn: boolean; message: string}> => {
+// export const checkAuth = async (): Promise<{ loggedIn: boolean; message: string}> => {
+//     try {
+//         const response = await axios.get(`/auth/check`);
+//         return response.data;
+//     } catch {
+//         console.log('User is not logged in.')
+//         return { loggedIn: false, message: 'Error occurred while checking authentication status' };
+//     }
+//   }
+
+export const getCurrentUser = async () => {
     try {
         const response = await axios.get(`/auth/check`);
+        console.log(response.data.user)
         return response.data;
-    } catch {
-        console.log('User is not logged in.')
-        return { loggedIn: false, message: 'Error occurred while checking authentication status' };
+    } catch (error) {
+        console.log(error);
     }
-    
-  }
+}
 
 export const logoutUser = async () => {
     try {

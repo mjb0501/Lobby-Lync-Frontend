@@ -1,12 +1,11 @@
-import { useContext } from 'react';
-import { AuthContext } from '../context/authContext';
 import { Link } from 'react-router-dom';
+import { useUserContext } from '../context/authContextProvider';
 
 export const NavBar = () => {
-    const { auth, logout } = useContext(AuthContext);
+    const { isAuthenticated, logout }  = useUserContext();
   
     return (
-        <nav className="bg-slate-600 text-white py-4 shadow-md">
+        <nav className="bg-slate-800 text-white py-4 shadow-md rounded-md mb-5">
             <div className="max-w-7xl mx-auto px-4 flex justify-between items-center">
                 {/* Logo or Brand */}
                 <div className="text-2xl font-semibold">
@@ -18,7 +17,7 @@ export const NavBar = () => {
                 {/* Navigation Links */}
                 <div className="space-x-6 flex items-center">
                     {/* Links for unauthenticated users */}
-                    {!auth ? (
+                    {!isAuthenticated ? (
                         <>
                             <Link to="/login" className="hover:text-gray-400 transition-colors duration-300">Login</Link>
                             <Link to="/register" className="hover:text-gray-400 transition-colors duration-300">Register</Link>

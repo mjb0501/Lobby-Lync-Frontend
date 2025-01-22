@@ -1,8 +1,8 @@
-import { useContext, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import AuthContext from "../context/authContext";
+import { useEffect, useState } from 'react';
 import { getPosts, acceptPost } from '../services/postServices';
 import { GameSearch } from '../components/gameSearchBar';
+import { useUserContext } from '../context/authContextProvider';
+import { ToastContainer, toast } from 'react-toastify';
 
 interface Post {
   postId: number;
@@ -15,7 +15,7 @@ interface Post {
 
 const Homepage = () => {
   //used to check whether user is logged in
-  const { auth } = useContext(AuthContext);
+  const { user } = useUserContext();
   //used to prevent the user from seeing incorrect content before authorization has been propagated
   const [loading, setLoading] = useState<boolean>(true);
   //used to hold the array of posts to be shown on the home page
@@ -24,7 +24,6 @@ const Homepage = () => {
   const [error, setError] = useState<string | null>(null);
   //used to specify which filters have been applied to the posts
   const [currentFilter, setCurrentFilter] = useState<string | null>(null);
-  const navigate = useNavigate();
   const [showModal, setShowModal] = useState<boolean>(false);
   const [description, setDescription] = useState<string>('');
   const [postIdToAccept, setPostIdToAccept] = useState<number>(-1);
@@ -59,9 +58,9 @@ const Homepage = () => {
   }
 
   const handleAcceptPost = async (postId: number) => {
-    if (!auth) {
-      navigate('/login');
-      alert("Need to be logged in to accept post.");
+    if (!user.id) {
+      toast.info("Need to be logged in to accept post", {toastId: "1"})
+      //navigate('/login');
       return;
     }
 
@@ -85,12 +84,12 @@ const Homepage = () => {
       };
 
       await acceptPost(acceptData);
-      alert('Post accepted successfully!');
+      toast.success('Post accepted successfully', {toastId: "2"})
       setShowModal(false);
       setDescription('');
     } catch (error) {
       console.error('Error accepting post:', error);
-      alert('Failed to accept post.');
+      toast.error('Failed to accept post', {toastId: "3"})
     }
   };
 
@@ -102,10 +101,17 @@ const Homepage = () => {
 
   return (
     <div className='container mx-auto max-w-7xl'>
-      <h1 className='text-3xl font-bold mb-6 text-center'>
-        {auth ? 'Welcome to Your Dashboard!' : 'Welcome, please log in to continue.'}
-      </h1>
+      {/* Allows toast to show up. */}
+      <ToastContainer 
+        position="top-center"
+        pauseOnHover={false}
+        pauseOnFocusLoss={false}
+      />
 
+      <h1 className='text-3xl font-bold mb-6 text-center'>
+        {user.username ? `Welcome ${user.username}!` : 'Welcome, please log in to continue.'}
+      </h1>
+      
       <div className='mb-4'>
         <GameSearch filterByGame={filterByGame}/>
       </div>

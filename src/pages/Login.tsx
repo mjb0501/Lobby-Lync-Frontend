@@ -1,14 +1,14 @@
-import { useState, useContext } from 'react';
-import axios from 'axios';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import AuthContext from '../context/authContext';
 import { loginUser } from '../services/authServices';
+import { useUserContext } from '../context/authContextProvider';
+import { ToastContainer, toast } from 'react-toastify';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
-  const { login } = useContext(AuthContext);
+  const { checkAuthUser } = useUserContext();
 
   //Will log the user in once valid credentials have been provided
   //NEED TO INCLUDE MORE COMPREHENSIVE FAILED LOGIN MESSAGES
@@ -17,17 +17,24 @@ const Login = () => {
 
     try {
       await loginUser(email, password);
-      axios.defaults.withCredentials = true;
-      login();
+      //axios.defaults.withCredentials = true;
+      await checkAuthUser();
       navigate('/');
     } catch (error) {
       console.error(error);
-      alert('Login failed!');
+      toast.error('Login failed', {toastId: '5'});
     }
   };
 
   return (
     <div className="min-h-screen bg-slate-600 flex items-start justify-center py-44">
+
+      <ToastContainer 
+        position="top-center"
+        pauseOnHover={false}
+        pauseOnFocusLoss={false}
+      />
+
       <div className="bg-slate-500 rounded-lg shadow-lg p-8 w-full max-w-md">
         <h2 className="text-2xl font-semibold text-slate-50 mb-6 text-center">Login</h2>
         <form onSubmit={handleLogin} className="space-y-4">

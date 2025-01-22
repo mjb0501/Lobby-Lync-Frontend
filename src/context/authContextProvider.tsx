@@ -1,45 +1,86 @@
-import { useState, ReactNode, useEffect } from 'react';
-import { AuthContext } from './authContext';
-import { checkAuth, logoutUser } from '../services/authServices';
+import { createContext, useContext, useEffect, useState } from "react"
+import { getCurrentUser, logoutUser } from "../services/authServices";
+import { ContextType, UserType } from "../types";
+import { useNavigate } from "react-router-dom";
 
-//Context provider for the entire website that propagates whether a user is logged in or not
-export const AuthProvider = ({
-    children
-}: {children: ReactNode}) => {
-    const [auth, setAuth] = useState<boolean>(false);
-    const [loading, setLoading] = useState<boolean>(true);
+export const INITIAL_USER = {
+    id: '',
+    username: '',
+    email: ''
+}
 
-    const login = () => setAuth(true);
-    
-    const logout = () => {
+const INITIAL_STATE = {
+    user: INITIAL_USER,
+    isLoading: false,
+    setUser: () => {},
+    isAuthenticated: false,
+    setIsAuthenticated: () => {},
+    logout: () => {},
+    checkAuthUser: async () => false as boolean,
+}
+
+const AuthContext = createContext<ContextType>(INITIAL_STATE);
+
+const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+    const [user, setUser] = useState<UserType>(INITIAL_USER);
+    const [isLoading, setIsLoading] = useState(false);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+    const navigate = useNavigate();
+
+    const checkAuthUser = async () => {
         try {
-            logoutUser();
-            setAuth(false);
-            window.location.reload();
+            const currentAccount = await getCurrentUser();
+            console.log(currentAccount);
+            if(currentAccount) {
+                setUser({
+                    id: currentAccount.id,
+                    username: currentAccount.username,
+                    email: currentAccount.email
+                })
+
+                setIsAuthenticated(true);
+
+                return true;
+            }
+
+            return false;
         } catch (error) {
-            console.error('Logout failed', error);
+            console.log(error);
+            return false;
+        } finally {
+            setIsLoading(false);
         }
+    };
+
+    const logout = async () => {
+        setUser(INITIAL_USER);
+        setIsAuthenticated(false);
+        await logoutUser();
+        navigate('/login');
     }
 
     useEffect(() => {
-        const checkAuthorization = async () => {
-            try {
-                const response = await checkAuth();
-                console.log("checking auth");
-                setAuth(response.loggedIn);
-            } catch {
-                setAuth(false);
-            } finally {
-                setLoading(false);
-            }
-        };
+        checkAuthUser();
+    }, []);
 
-        checkAuthorization();
-    }, [])
+    const value: ContextType = {
+        user,
+        setUser,
+        isLoading,
+        isAuthenticated,
+        setIsAuthenticated,
+        logout,
+        checkAuthUser
+    }
 
     return (
-        <AuthContext.Provider value={{ auth, loading, login, logout}}>
+        <AuthContext.Provider value={value}>
             {children}
         </AuthContext.Provider>
     )
 }
+
+export default AuthProvider;
+
+export const useUserContext = () => useContext(AuthContext);

@@ -1,9 +1,10 @@
-import { useState, useContext } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import AuthContext from '../context/authContext';
 import { GameSearch } from '../components/gameSearchBar';
 import { gamePlatforms, gamePlatformsData } from '../services/gameServices';
-import { createPost, deletePost } from '../services/postServices';
+import { createPost, deletePost, getYourPost } from '../services/postServices';
+import { useUserContext } from '../context/authContextProvider';
+import { ToastContainer, toast } from 'react-toastify';
 
 interface Post {
     gameId: number;
@@ -14,17 +15,44 @@ interface Post {
 
 const CreatePost = () => {
     //Used to know if the user is logged in or not
-    const { auth } = useContext(AuthContext);
+    const { isAuthenticated } = useUserContext();
+    //this state is used to track if the user has already created a post
+    const [preexistingPost, setPreexistingPost] = useState<boolean>(false);
     //Represents the user's chosen post attributes
     const [post, setPost] = useState<Post>({ gameId: -1, gameName: '', platforms: [], description: '' });
     //Is set to the platforms available for the chosen game
     const [platforms, setPlatforms] = useState<string[]>([]);
     //represents whether loading is happening or an error has occurred
-    const [loading, setLoading] = useState<boolean>(false);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
     //Used to map out all the buttons
     const allPlatforms = ['Xbox', 'Playstation', 'PC', 'Switch'];
     const navigate = useNavigate();
+
+    const fetchYourPost = async () => {
+        try {
+            const response = await getYourPost();
+            if (response) {
+                setPreexistingPost(true);
+                console.log(response);
+                chooseGame(response.game);
+                setPost((prevPost) => ({
+                    ...prevPost,
+                    platforms: response.platforms,
+                    description: response.description
+                }));
+            }
+            setIsLoading(false);
+        } catch {
+            setPreexistingPost(false);
+            setIsLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        setIsLoading(true);
+        fetchYourPost();
+    }, []);
 
     //Called when a user chooses a game, sets the proper atttributes in post
     const chooseGame = async (game: string) => {
@@ -79,7 +107,7 @@ const CreatePost = () => {
             description: post.description,
         };
 
-        setLoading(true);
+        setIsLoading(true);
         setError(null);
 
         try {
@@ -87,18 +115,13 @@ const CreatePost = () => {
 
             //if a response is already uploaded then prompt to replace with new post
             if (!response.postId) {
-                const confirmation = window.confirm("You are only allowed to upload one post at a time.  Click ok if you would like to delete that post and upload this one instead.  Click cancel if you want to leave that other post up.");
-                if (confirmation) {
-                    try {
-                        await deletePost();
-                        console.log(postData);
-                        response = await createPost(postData);
-                    } catch (error) {
-                        console.error("Error while deleting and uploading new post:", error);
-                        alert("Failed to delete and Upload new post.");
-                        return;
-                    }
-                } else {
+                try {
+                    await deletePost();
+                    console.log(postData);
+                    response = await createPost(postData);
+                } catch (error) {
+                    console.error("Error while deleting and uploading new post:", error);
+                    toast.error('Failed to delete old post and upload new post', { toastId: '4'})
                     return;
                 }
             }
@@ -111,21 +134,42 @@ const CreatePost = () => {
         } catch {
             setError('Failed to create post. Please try again later.');
         } finally {
-            setLoading(false);
+            setIsLoading(false);
         }
         
     }
 
     return (
         <>
-            {auth ? (
+            {isAuthenticated ? (
                 <div className="min-h-screen bg-slate-600 text-white flex flex-col items-center py-8">
-                    {/* Game Search */}
-                    <GameSearch filterByGame={chooseGame}/>
                     
+                    <ToastContainer 
+                        position="top-center"
+                        pauseOnHover={false}
+                        pauseOnFocusLoss={false}
+                    />
+
                     {/* Game and Platform Selection*/}
                     <div className="w-full max-w-4xl mt-8 bg-slate-500 p-6 rounded-lg shadow-lg">
-                        <h2 className="text-xl font-semibold mb-4">Select Platforms for {post.gameName}</h2>
+
+                        { preexistingPost ? (
+                            <div className="bg-red-500 rounded-lg">
+                                <h2 className="text-white text-5xl">
+                                    Warning!
+                                </h2>
+                                <h2 className="text-white text-base font-semibold">
+                                    You are only allowed to create one post at a time. 
+                                    Creating a new post will delete your old one.
+                                </h2>
+                            </div>
+                        ) : (<></>)}
+
+                        {/* Game Search */}
+                        <h2 className="text-xl font-semibold mb-4">Choose Game</h2>
+                        <GameSearch filterByGame={chooseGame}/>
+
+                        <h2 className="text-xl font-semibold mb-4 mt-6">Select Platforms for {post.gameName}</h2>
                         {post.gameName && (
                             <button 
                                 onClick={clearGame}
@@ -183,7 +227,7 @@ const CreatePost = () => {
                                 onClick={handleSubmit} 
                                 className="py-2 px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-md focus:outline-none focus:ring-2 fodus:ring-blue-500"
                             >
-                                {loading ? 'Submitting...' : 'Submit Post'}
+                                {isLoading ? 'Submitting...' : 'Create Post'}
                             </button>
                             {error && <p className="text-red-500 mt-2">{error}</p>}
                         </div>

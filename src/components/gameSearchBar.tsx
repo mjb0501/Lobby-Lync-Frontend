@@ -1,44 +1,49 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { autocompleteGames } from '../services/gameServices';
-import { useDebounce } from '../hooks/debounce';
+import useDebounce from '../hooks/debounce';
 
 interface GameSearchProps {
     filterByGame: (game: string) => void;
 }
 
 export const GameSearch: React.FC<GameSearchProps> = ({filterByGame}) => {
-    const [query, setQuery] = useState<string>('');
+    const [searchValue, setsearchValue] = useState<string>('');
     const [games, setGames] = useState<string[]>([]);
     const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
 
-    //this will fetch the list of games 500ms after the last type by the user
-    //this works by calling the useDebounce hook in the hooks folder
-    const fetchGames = useDebounce(async () => {
-        if (query.length > 2)
+    //will set the debouncedValue to searchValue 500ms after last change
+    const debouncedValue = useDebounce(searchValue, 500)
+
+    const fetchGames = async (debouncedValue: string) => {
+        if (debouncedValue.length > 2)
         {
             try {
-                const response = await autocompleteGames(query);
+                const response = await autocompleteGames(debouncedValue);
                 setGames(response);
             } catch (error) {
                 console.error('Error fetching games:', error);
             }
         } else {
             setGames([]);
-        }
-    });
+        };
+    }
 
-    //when a change is detected call the autocomplete function with the new updated query
+    useEffect(() => {
+        fetchGames(debouncedValue);
+    }, [debouncedValue]);
+
+    //when a change is detected call the autocomplete function with the new updated searchValue
     const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const searchQuery = e.target.value;
-        setQuery(searchQuery);
-        fetchGames();
+        const searchsearchValue = e.target.value;
+        setsearchValue(searchsearchValue);
+        //fetchGames();
     };
 
     //when a game from the autocomplete is chosen call the provided filter function
     const handleGameClick = (game: string) => {
         filterByGame(game);
         //clears search bar
-        setQuery(''); 
+        setsearchValue(''); 
         //clears autocomplete results
         setGames([]);
     }
@@ -55,7 +60,7 @@ export const GameSearch: React.FC<GameSearchProps> = ({filterByGame}) => {
         <div className="relative w-full max-w-md mx-auto">
             <input
                 type="text"
-                value={query}
+                value={searchValue}
                 onChange={handleChange}
                 placeholder="Search for a game"
                 onFocus={handleFocus}

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { registerUser } from '../services/authServices';
+import { ToastContainer, toast } from 'react-toastify';
 
 const Register = () => {
     const [username, setUsername] = useState<string>('');
@@ -15,15 +16,23 @@ const Register = () => {
   
       try {
         await registerUser(username, email, password);
-        navigate('/login');
+        toast.success('Registration successful', {toastId: '7'})
+        navigate('/login')
       } catch (error) {
         console.error(error);
-        alert('Registration failed!');
+        toast.error('Registration failed', {toastId: '6'});
       }
     };
     
     return (
         <div className="min-h-screen bg-slate-600 flex items-start justify-center py-44">
+
+          <ToastContainer 
+            position="top-center"
+            pauseOnHover={false}
+            pauseOnFocusLoss={false}
+          />
+
           <div className="bg-slate-500 rounded-lg shadow-lg p-8 w-full max-w-md">
             <h2 className="text-2xl font-semibold text-slate-50 mb-6 text-center">Register</h2>
             <form onSubmit={handleRegister} className="space-y-4">
