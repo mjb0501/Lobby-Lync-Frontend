@@ -21,20 +21,9 @@ export const registerUser = async (username: string, email: string, password: st
     
   };
 
-// export const checkAuth = async (): Promise<{ loggedIn: boolean; message: string}> => {
-//     try {
-//         const response = await axios.get(`/auth/check`);
-//         return response.data;
-//     } catch {
-//         console.log('User is not logged in.')
-//         return { loggedIn: false, message: 'Error occurred while checking authentication status' };
-//     }
-//   }
-
 export const getCurrentUser = async () => {
     try {
         const response = await axios.get(`/auth/check`);
-        console.log(response.data.user)
         return response.data;
     } catch (error) {
         console.log(error);
@@ -48,4 +37,12 @@ export const logoutUser = async () => {
         console.error('Error logging out user: ', error);
     }
     
+}
+
+export const editPlatforms = async (platformData: {Xbox: string, Playstation: string, Steam: string, Switch: string}) => {
+    try {
+        await axios.put(`/auth/editPlatforms`, platformData)
+    } catch (error) {
+        console.log(error);
+    }
 }

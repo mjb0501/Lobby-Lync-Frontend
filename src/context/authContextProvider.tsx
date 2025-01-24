@@ -6,7 +6,8 @@ import { useNavigate } from "react-router-dom";
 export const INITIAL_USER = {
     id: '',
     username: '',
-    email: ''
+    email: '',
+    platforms: {}
 }
 
 const INITIAL_STATE = {
@@ -23,7 +24,7 @@ const AuthContext = createContext<ContextType>(INITIAL_STATE);
 
 const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [user, setUser] = useState<UserType>(INITIAL_USER);
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
 
     const navigate = useNavigate();
@@ -31,13 +32,15 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const checkAuthUser = async () => {
         try {
             const currentAccount = await getCurrentUser();
-            console.log(currentAccount);
-            if(currentAccount) {
+            
+            if(currentAccount[0]) {
                 setUser({
-                    id: currentAccount.id,
-                    username: currentAccount.username,
-                    email: currentAccount.email
+                    id: currentAccount[0].id,
+                    username: currentAccount[0].username,
+                    email: currentAccount[0].email,
+                    platforms: currentAccount[0].platforms || {},
                 })
+
 
                 setIsAuthenticated(true);
 
