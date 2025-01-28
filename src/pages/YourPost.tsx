@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { getYourPost, deletePost } from "../services/postServices";
+import { formatDate } from "../utils/formatDate";
+import { useNavigate } from "react-router-dom";
 
 interface Acceptance {
     username: string;
@@ -19,6 +21,7 @@ interface Post {
 const YourPost = () => {
     const [post, setPost] = useState<Post | null>(null);
     const [error, setError] = useState<string>('');
+    const navigate = useNavigate();
     
     //Fetches the user's post data
     const fetchYourPost = async () => {
@@ -56,15 +59,28 @@ const YourPost = () => {
                 <div className="max-w-4xl mx-auto bg-slate-500 p-6 rounded-lg shadow-lg">
                     <h1 className="text-3xl font-semibold mb-4">Your Post</h1>
 
-                    {/* Post Details */}
-                    <div className="mb-6">
-                        <h2 className="text-xl font-medium text-slate-100">{post.description}</h2>
-                        <p className="mt-2 text-lg"><strong>Platform:</strong> {post.platforms.join(', ')}</p>
-                        <p className="mt-2 text-lg"><strong>Game:</strong> {post.game}</p>
-                        <p className="mt-2 text-lg"><strong>Description:</strong> {post.description}</p>
-                        <p className="mt-2 text-lg"><strong>Posted At:</strong> {new Date(post.createdAt).toLocaleString()}</p>
+                    <div className="flex justify-between">
+                        <h2 className="text-xl font-bold">{post.game}</h2>
+                        <span className="text-sm">{formatDate(post.createdAt)}</span>
                     </div>
                     
+                    {/* Post Creator and Platforms */}
+                    <div className="flex justify-between items-center text-sm mb-4">
+                        <span>{post.user}</span>
+                        <span>{post.platforms.join(', ')}</span>
+                    </div>
+                    
+                    {/* Description */}
+                    <h2 className="text-xl font-bold mb-2">{post.description}</h2>
+                    
+                    {/* Edit Button*/}
+                    <button 
+                        onClick={() => {navigate('/editPost')}}
+                        className="w-40 py-2 px-6 mt-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-red-500 mr-4"
+                    >
+                        Edit Post
+                    </button>
+
                     {/* Delete Button*/}
                     <button 
                         onClick={handleDelete}

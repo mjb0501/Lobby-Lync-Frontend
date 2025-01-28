@@ -1,12 +1,22 @@
 import { useEffect, useState } from 'react';
-import { getPosts, acceptPost } from '../services/postServices';
+import { getPosts, acceptPost, getAcceptedPosts } from '../services/postServices';
 import { GameSearch } from '../components/gameSearchBar';
 import { useUserContext } from '../context/authContextProvider';
 import { ToastContainer, toast } from 'react-toastify';
+import { formatDate } from '../utils/formatDate';
 
 interface Post {
   postId: number;
   user: string;
+  game: string;
+  description: string;
+  createdAt: string;
+  platforms: string[];
+}
+
+interface AcceptedPost {
+  postId: number;
+  creator: string;
   game: string;
   description: string;
   createdAt: string;
@@ -20,6 +30,8 @@ const Homepage = () => {
   const [loading, setLoading] = useState<boolean>(true);
   //used to hold the array of posts to be shown on the home page
   const [ posts, setPosts ] = useState<Post[]>([]);
+  //used to determine which posts the user has already accepted to prevent accepting multiple times
+  const [acceptedPosts, setAcceptedPosts] = useState<AcceptedPost[]>([]);
   //MAY WANT TO REMOVE, used to hold the error occurring
   const [error, setError] = useState<string | null>(null);
   //used to specify which filters have been applied to the posts
@@ -41,8 +53,20 @@ const Homepage = () => {
     }
   }
 
+  const fetchAcceptedPosts = async () => {
+    try {
+      const posts = await getAcceptedPosts();
+      if (posts) {
+        setAcceptedPosts(posts);
+      }
+    } catch {
+      setError('Failed while trying to get accepted posts')
+    }
+  }
+
   //on loading website fetch the posts
   useEffect(() => {
+    fetchAcceptedPosts();
     fetchPosts();
   }, []);
 
@@ -124,23 +148,38 @@ const Homepage = () => {
       )}
 
       {posts.length > 0 ? (
-        <ul className='space-y-6'>
-          {posts.map((post) => (
-            <li key={post.postId} className="bg-slate-500 p-4 rounded-lg shadow">
-              <h2 className="text-xl font-bold mb-2">{post.description}</h2>
-              <p><strong>User:</strong> {post.user}</p>
-              <p><strong>Platform:</strong> {post.platforms.join(', ')}</p>
-              <p><strong>Game:</strong> {post.game}</p>
-              <p><strong>Description:</strong> {post.description}</p>
-              <p><strong>Posted At:</strong> {new Date(post.createdAt).toLocaleString()}</p>
-              <button
-                className="btn btn-primary mt-4"
-                onClick={() => handleAcceptPost(post.postId)}
-              >
-                  Accept Post
-              </button>
-            </li>
-          ))}
+        <ul className='space-y-6 flex flex-col items-center'>
+          {posts.map((post) => {
+            const isPostAccepted = acceptedPosts.some((accepted) => accepted.postId === post.postId);
+
+            return (
+              <li key={post.postId} className="bg-slate-500 p-2 rounded-lg shadow w-full max-w-md">
+
+                {/* Game Name and Created At */}
+                <div className="flex justify-between">
+                  <h2 className="text-xl font-bold">{post.game}</h2>
+                  <span className="text-sm">{formatDate(post.createdAt)}</span>
+                </div>
+
+                {/* Post Creator and Platforms */}
+                <div className="flex justify-between items-center text-sm mb-4">
+                  <span>{post.user}</span>
+                  <span>{post.platforms.join(', ')}</span>
+                </div>
+
+                {/* Description */}
+                <h2 className="text-xl font-bold mb-2">{post.description}</h2>
+
+                <button
+                  className={`btn mt-4 ${isPostAccepted ? 'bg-gray-700 cursor-not-allowed' : 'btn-primary'}`}
+                  onClick={() => handleAcceptPost(post.postId)}
+                >
+                    {isPostAccepted ? 'Already Accepted' : 'Accept Post'}
+                </button>
+              </li>
+            )
+          }
+          )}
         </ul>
       ) : (
         <p className="text-center">No posts currently exist.</p>

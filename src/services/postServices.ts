@@ -42,9 +42,34 @@ export const getYourPost = async () => {
 
 export const deletePost = async () => {
     try {
-        await axios.get('/posts/deletePost');
+        await axios.delete('/posts/deletePost');
     } catch (error) {
         console.error('Error deleting post:', error);
         throw error;
+    }
+}
+
+export const getAcceptedPosts = async () => {
+    try {
+        const response = await axios.get(`/posts/getAcceptedPosts`);
+        return response.data;
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+export const deletePostAcceptance = async () => {
+    try {
+        await axios.delete(`/posts/deletePostAcceptance`);
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export const editPost = async (postData: {postId: number, platformIds: string[], gameId: number, description: string}) => {
+    try {
+        await axios.put(`/posts/updatePost`, postData)
+    } catch (error) {
+        console.log(error);
     }
 }

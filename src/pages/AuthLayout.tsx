@@ -1,7 +1,7 @@
 import { useUserContext } from '../context/authContextProvider'
 import { Navigate, Outlet } from 'react-router-dom';
 
-const RootLayout = () => {
+const AuthLayout = () => {
     const { isLoading, isAuthenticated } = useUserContext();
 
     if(isLoading) {
@@ -10,8 +10,8 @@ const RootLayout = () => {
         )
     }
 
-    if(!isAuthenticated) {
-        return <Navigate to="/login" replace />
+    if(isAuthenticated) {
+        return <Navigate to="/" replace />
     }
 
   return (
@@ -21,4 +21,4 @@ const RootLayout = () => {
   )
 }
 
-export default RootLayout
+export default AuthLayout

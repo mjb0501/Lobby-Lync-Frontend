@@ -2,21 +2,19 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GameSearch } from '../components/gameSearchBar';
 import { gamePlatforms, gamePlatformsData } from '../services/gameServices';
-import { createPost, deletePost, getYourPost } from '../services/postServices';
-import { ToastContainer, toast } from 'react-toastify';
+import { editPost, getYourPost } from '../services/postServices';
 
 interface Post {
+    postId: number;
     gameId: number;
     gameName: string;
     platforms: string[];
     description: string;
 }
 
-const CreatePost = () => {
-    //this state is used to track if the user has already created a post
-    const [preexistingPost, setPreexistingPost] = useState<boolean>(false);
+const EditPost = () => {
     //Represents the user's chosen post attributes
-    const [post, setPost] = useState<Post>({ gameId: -1, gameName: '', platforms: [], description: '' });
+    const [post, setPost] = useState<Post>({ postId: -1, gameId: -1, gameName: '', platforms: [], description: '' });
     //Is set to the platforms available for the chosen game
     const [platforms, setPlatforms] = useState<string[]>([]);
     //represents whether loading is happening or an error has occurred
@@ -30,18 +28,17 @@ const CreatePost = () => {
         try {
             const response = await getYourPost();
             if (response) {
-                setPreexistingPost(true);
                 console.log(response);
                 chooseGame(response.game);
                 setPost((prevPost) => ({
                     ...prevPost,
+                    postId: response.postId,
                     platforms: response.platforms,
                     description: response.description
                 }));
             }
             setIsLoading(false);
         } catch {
-            setPreexistingPost(false);
             setIsLoading(false);
         }
     };
@@ -99,6 +96,7 @@ const CreatePost = () => {
         event.preventDefault();
 
         const postData = {
+            postId: post.postId,
             platformIds: post.platforms,
             gameId: post.gameId,
             description: post.description,
@@ -108,27 +106,15 @@ const CreatePost = () => {
         setError(null);
 
         try {
-            let response = await createPost(postData);
+            const response = await editPost(postData);
 
-            //if a response is already uploaded then prompt to replace with new post
-            if (!response.postId) {
-                try {
-                    await deletePost();
-                    response = await createPost(postData);
-                } catch (error) {
-                    console.error("Error while deleting and uploading new post:", error);
-                    toast.error('Failed to delete old post and upload new post', { toastId: '4'})
-                    return;
-                }
-            }
+            console.log('Post edited successfully:', response);
 
-            console.log('Post created successfully:', response);
-
-            setPost({ gameId: -1, gameName: '', platforms: [], description: '' });
+            setPost({ postId: -1, gameId: -1, gameName: '', platforms: [], description: '' });
             setPlatforms([]);
             navigate('/yourPost');
         } catch {
-            setError('Failed to create post. Please try again later.');
+            setError('Failed to edit post. Please try again later.');
         } finally {
             setIsLoading(false);
         }
@@ -137,27 +123,9 @@ const CreatePost = () => {
 
     return (
         <div className="min-h-screen bg-slate-600 text-white flex flex-col items-center py-8">
-                    
-            <ToastContainer 
-                position="top-center"
-                pauseOnHover={false}
-                pauseOnFocusLoss={false}
-            />
 
             {/* Game and Platform Selection*/}
             <div className="w-full max-w-4xl mt-8 bg-slate-500 p-6 rounded-lg shadow-lg">
-
-                { preexistingPost ? (
-                    <div className="bg-red-500 rounded-lg">
-                        <h2 className="text-white text-5xl">
-                            Warning!
-                        </h2>
-                        <h2 className="text-white text-base font-semibold">
-                            You are only allowed to create one post at a time. 
-                            Creating a new post will delete your old one.
-                        </h2>
-                    </div>
-                ) : (<></>)}
 
                 {/* Game Search */}
                 <h2 className="text-xl font-semibold mb-4">Choose Game</h2>
@@ -221,7 +189,7 @@ const CreatePost = () => {
                         onClick={handleSubmit} 
                         className="py-2 px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-md focus:outline-none focus:ring-2 fodus:ring-blue-500"
                     >
-                        {isLoading ? 'Submitting...' : 'Create Post'}
+                        {isLoading ? 'Submitting...' : 'Edit Post'}
                     </button>
                     {error && <p className="text-red-500 mt-2">{error}</p>}
                 </div>
@@ -230,4 +198,4 @@ const CreatePost = () => {
     )
 }
 
-export default CreatePost
+export default EditPost

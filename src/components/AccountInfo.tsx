@@ -15,9 +15,9 @@ const AccountInfo = () => {
                 <p className="text-sm text-red-400">*Adding your platforms allows other users to see your platform username when accepting their post.  This prevents you from having to enter your username each time you accept a post.</p>
             )}
             
-            <h3 className="text-lg">Platforms: </h3>
+            <h3 className="text-2xl">Platforms: </h3>
             {Object.entries(user.platforms).map(([platformName, platformUsername]) => (
-                <h3 key={platformName}>
+                <h3 key={platformName} className="mb-2 text-xl">
                     {platformName}: {platformUsername}
                 </h3>
             ))}

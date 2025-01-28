@@ -13,6 +13,9 @@ import './App.css'
 import Profile from './pages/Profile.tsx';
 import EditPlatforms from './pages/EditPlatforms.tsx';
 import RootLayout from './pages/RootLayout.tsx';
+import AuthLayout from './pages/AuthLayout.tsx';
+import AcceptedPosts from './pages/AcceptedPosts.tsx';
+import EditPost from './pages/EditPost.tsx';
 
 axios.defaults.baseURL = 'http://localhost:3001';
 //console.log(process.env.REACT_APP_URL)
@@ -28,16 +31,23 @@ function App() {
           <NavBar />
           <Routes>
             
+            {/* Public Routes */}
+            <Route element={<AuthLayout />}>
+              <Route path="/register" element={<Register />} />
+              <Route path="/login" element={<Login />} />
+            </Route>
+
+            {/* Home is not in either because it can be accessed whether logged in or not */}
             <Route path="/" element={<Homepage />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/login" element={<Login />} />
 
             {/* Protected Routes */}
             <Route element={<RootLayout />}>
               <Route path="/createPost" element={<CreatePost />} />
+              <Route path="/editPost" element={<EditPost />} />
               <Route path="/yourPost" element={<YourPost />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/editPlatforms" element={<EditPlatforms />} />
+              <Route path="/acceptedPosts" element={<AcceptedPosts />} />
             </Route>
           </Routes>
         </AuthProvider>
