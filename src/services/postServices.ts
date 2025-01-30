@@ -20,7 +20,7 @@ export const createPost = async (postData: { platformIds: string[], gameId: numb
     }
 };
 
-export const acceptPost = async (acceptData: {postId: number, description: string}) => {
+export const acceptPost = async (acceptData: {postId: number, description: string, platform: string, platformUsername: string}) => {
     try {
         const response = await axios.post(`/posts/acceptPost`, acceptData);
         return response.data
@@ -30,7 +30,7 @@ export const acceptPost = async (acceptData: {postId: number, description: strin
     }
 }
 
-export const getYourPost = async () => {
+export const fetchUserPost = async () => {
     try {
         const response = await axios.get(`/posts/getPostById`);
         return response.data
@@ -58,9 +58,9 @@ export const getAcceptedPosts = async () => {
     }
 }
 
-export const deletePostAcceptance = async () => {
+export const deletePostAcceptance = async (postId: number) => {
     try {
-        await axios.delete(`/posts/deletePostAcceptance`);
+        await axios.delete(`/posts/deletePostAcceptance`, {params: { postId }});
     } catch (error) {
         console.log(error)
     }

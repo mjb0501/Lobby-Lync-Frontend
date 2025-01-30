@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react'
-import { deletePostAcceptance, getAcceptedPosts } from '../services/postServices';
 import { formatDate } from '../utils/formatDate';
+import { useGetAcceptedPosts } from '../hooks/fetchAcceptedPosts';
+import { useDeleteAccept } from '../hooks/deletePostAcceptance';
+import { ToastContainer, toast } from 'react-toastify';
 
 interface AcceptedPost {
     postId: number;
@@ -12,31 +13,15 @@ interface AcceptedPost {
 }
 
 const AcceptedPosts = () => {
-    const [acceptedPosts, setAcceptedPosts] = useState<AcceptedPost[]>([]);
-    const [error, setError] = useState('')
+    const { data: acceptedPosts, isLoading: isLoadingAcceptPosts } = useGetAcceptedPosts();
+    const { mutateAsync: deletePostAcceptance, isLoading: isLoadingDelete } = useDeleteAccept(); 
 
-    const fetchAcceptedPosts = async () => {
+    if (isLoadingAcceptPosts || isLoadingDelete) return <p>Loading...</p>
+
+    const handleDelete = async (postId: number) => {
         try {
-            const posts = await getAcceptedPosts();
-            if (posts) {
-                setAcceptedPosts(posts);
-            } else {
-                setError('We failed to find any posts you have accepted')
-            }
-        } catch {
-            setError('We failed to find any posts you have accepted')
-        }
-    };
-
-    useEffect(() => {
-        fetchAcceptedPosts();
-    }, []);
-
-    const handleDelete = async () => {
-        try {
-            await deletePostAcceptance();
-            setAcceptedPosts([]);
-            fetchAcceptedPosts();
+            await deletePostAcceptance(postId);
+            toast.success('Successfully Deleted Acceptance', {toastId: 1})
         } catch (error) {
             console.log(error);
         }
@@ -44,11 +29,18 @@ const AcceptedPosts = () => {
 
   return (
     <div className="min-h-screen bg-slate-600 text-white py-8 px-4">
+
+        <ToastContainer 
+            position="top-center"
+            pauseOnHover={false}
+            pauseOnFocusLoss={false}
+        />
+
             <h1 className="text-3xl text-slate-100 mb-4">Accepted Posts</h1>
 
             {acceptedPosts.length > 0 ? (
                 <ul className='space-y-6 flex flex-col items-center'>
-                          {acceptedPosts.map((post) => (
+                          {acceptedPosts.map((post: AcceptedPost) => (
                             <li key={post.postId} className="bg-slate-500 p-2 rounded-lg shadow w-full max-w-md">
                 
                                 {/* Game Name and Created At */}
@@ -68,7 +60,8 @@ const AcceptedPosts = () => {
                     
                                 <button
                                     className="w-30  py-4 px-6 mt-4 bg-red-600 hover:bg-red-700 text-white rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                                    onClick={handleDelete}
+                                    onClick={() => {handleDelete(post.postId)}}
+                                    disabled={isLoadingDelete}
                                 >
                                     Delete
                                 </button>
@@ -77,7 +70,7 @@ const AcceptedPosts = () => {
                         </ul>
             ) : (
                 <p>
-                    {error}
+                    No accepted posts found.
                 </p>
             )}
         </div>

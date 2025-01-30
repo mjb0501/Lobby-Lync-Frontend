@@ -59,6 +59,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const logout = async () => {
         setUser(INITIAL_USER);
         setIsAuthenticated(false);
+        document.cookie = 'accessToken=; Max-Age=-1; path=/';
         await logoutUser();
         navigate('/login');
     }

@@ -1,53 +1,26 @@
-import { useEffect, useState } from "react";
-import { getYourPost, deletePost } from "../services/postServices";
 import { formatDate } from "../utils/formatDate";
 import { useNavigate } from "react-router-dom";
+import { useUserPost } from "../hooks/fetchUserPost";
+import { useDeletePost } from "../hooks/deleteUserPost";
 
 interface Acceptance {
     username: string;
     description: string;
+    platform: string;
+    platformUsername?: string;
 }
 
-interface Post {
-    postId: number;
-    user: string;
-    game: string;
-    description: string;
-    createdAt: string;
-    platforms: string[];
-    acceptances: Acceptance[];
-  }
-
 const YourPost = () => {
-    const [post, setPost] = useState<Post | null>(null);
-    const [error, setError] = useState<string>('');
+    const { data: post, isLoading: isLoadingFetch } = useUserPost();
+    const { mutateAsync: deletePost, isLoading: isLoadingDelete } = useDeletePost();
     const navigate = useNavigate();
-    
-    //Fetches the user's post data
-    const fetchYourPost = async () => {
-        try {
-            const response = await getYourPost();
-            if (response) {
-                setPost(response);
-            } else {
-                setError('We failed to find any posts uploaded by you');
-            }
-        } catch {
-            setError('We failed to find any posts uploaded by you');
-        }
-    };
 
-    //Calls fetch post on load
-    useEffect(() => {
-        fetchYourPost();
-    }, []);
+    if (isLoadingFetch) return <p>Loading...</p>
 
     //Called when user clicks delete, calls backend to delete user's post
     const handleDelete = async () => {
         try {
             await deletePost();
-            setPost(null);
-            fetchYourPost();
         } catch {
             alert('Failed to delete post.');
         }
@@ -85,6 +58,7 @@ const YourPost = () => {
                     <button 
                         onClick={handleDelete}
                         className="w-40 py-2 px-6 mt-4 bg-red-600 hover:bg-red-700 text-white rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                        disabled={isLoadingDelete}
                     >
                         Delete Post
                     </button>
@@ -94,10 +68,15 @@ const YourPost = () => {
                         <h2 className="text-2xl font-semibold mb-4">Post Acceptances</h2>
                         <ul className="space-y-4">
                         {post.acceptances.length > 0 ? (
-                            post.acceptances.map((acceptance) => (
+                            post.acceptances.map((acceptance: Acceptance) => (
                                 <li key={acceptance.username} className="bg-gray-700 p-4 rounded-lg">
                                     <p className="text-lg"><strong>Username:</strong> {acceptance.username}</p>
                                     <p className="mt-2 text-lg"><strong>Description:</strong> {acceptance.description}</p>
+                                    {acceptance.platformUsername ? (
+                                        <p className="mt-2 text-lg"><strong>{acceptance.platform}:</strong> {acceptance.platformUsername}</p>
+                                    ) : (
+                                        <p className="mt-2 text-lg"><strong>Platform:</strong> {acceptance.platform}</p>
+                                    )}
                                 </li>
                             ))
                         ) : (
@@ -108,7 +87,7 @@ const YourPost = () => {
                     
                 </div>
             ) : (
-                <div>{error}</div>
+                <div>No posts uploaded.</div>
             )}
         </div>
     );

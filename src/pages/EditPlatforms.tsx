@@ -4,9 +4,9 @@ import { useNavigate } from 'react-router-dom';
 import { useUserContext } from '../context/authContextProvider';
 
 const EditPlatforms = () => {
-    const { user, checkAuthUser } = useUserContext();
+    const { user, setUser } = useUserContext();
     const [usernames, setUsernames] = useState({
-        Xbox: user.platforms["Xbox"] || "",
+        Xbox: user.platforms["Xbox"] || '',
         Playstation: user.platforms["Playstation"] || "",
         Steam: user.platforms["Steam"] || "",
         Switch: user.platforms["Switch"] || "",
@@ -24,7 +24,15 @@ const EditPlatforms = () => {
     const handleSubmit = async () => {
         try {
             await editPlatforms(usernames);
-            await checkAuthUser();
+
+            const filteredUsernames = Object.fromEntries(
+                Object.entries(usernames).filter(([_, value]) => value.trim())
+            );
+
+            setUser((prevUser) => ({
+                ...prevUser,
+                platforms: filteredUsernames,
+            }))
             navigate('/profile');
         } catch (error) {
             console.log(error);

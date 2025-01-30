@@ -2,8 +2,10 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GameSearch } from '../components/gameSearchBar';
 import { gamePlatforms, gamePlatformsData } from '../services/gameServices';
-import { createPost, deletePost, getYourPost } from '../services/postServices';
 import { ToastContainer, toast } from 'react-toastify';
+import { useUserPost } from '../hooks/fetchUserPost';
+import { useCreatePost } from '../hooks/createUserPost';
+import { useDeletePost } from '../hooks/deleteUserPost';
 
 interface Post {
     gameId: number;
@@ -13,49 +15,40 @@ interface Post {
 }
 
 const CreatePost = () => {
+    const { data: currentPost, isLoading: isLoadingFetch } = useUserPost();
+    const { mutateAsync: createPost, isLoading: isLoadingCreate } = useCreatePost();
+    const { mutateAsync: deletePost, isLoading: isLoadingDelete } = useDeletePost();
     //this state is used to track if the user has already created a post
     const [preexistingPost, setPreexistingPost] = useState<boolean>(false);
     //Represents the user's chosen post attributes
-    const [post, setPost] = useState<Post>({ gameId: -1, gameName: '', platforms: [], description: '' });
+    const [updatedPost, setUpdatedPost] = useState<Post>({ gameId: -1, gameName: '', platforms: [], description: '' });
     //Is set to the platforms available for the chosen game
     const [platforms, setPlatforms] = useState<string[]>([]);
-    //represents whether loading is happening or an error has occurred
-    const [isLoading, setIsLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
     //Used to map out all the buttons
     const allPlatforms = ['Xbox', 'Playstation', 'Steam', 'Switch'];
     const navigate = useNavigate();
 
-    const fetchYourPost = async () => {
-        try {
-            const response = await getYourPost();
-            if (response) {
-                setPreexistingPost(true);
-                console.log(response);
-                chooseGame(response.game);
-                setPost((prevPost) => ({
-                    ...prevPost,
-                    platforms: response.platforms,
-                    description: response.description
-                }));
-            }
-            setIsLoading(false);
-        } catch {
-            setPreexistingPost(false);
-            setIsLoading(false);
-        }
-    };
-
     useEffect(() => {
-        setIsLoading(true);
-        fetchYourPost();
-    }, []);
+        if (currentPost) {
+            setPreexistingPost(true);
+            setUpdatedPost({
+                gameId: currentPost.gameId || -1,
+                gameName: currentPost.game || '',
+                platforms: currentPost.platforms || [],
+                description: currentPost.description || ''
+            });
+            chooseGame(currentPost.game);
+        }
+    }, [currentPost]);
+
+    if (isLoadingFetch) return <p>Loading...</p>
 
     //Called when a user chooses a game, sets the proper atttributes in post
     const chooseGame = async (game: string) => {
         try {
             const response: gamePlatformsData = await gamePlatforms(game);
-            setPost((prevPost) => ({
+            setUpdatedPost((prevPost) => ({
                 ...prevPost,
                 gameId: response.gameId,
                 gameName: game,
@@ -68,7 +61,7 @@ const CreatePost = () => {
 
     //Called when the user clears their game choice, removes game and platform attributes from post
     const clearGame = () => {
-        setPost((prevPost) => ({
+        setUpdatedPost((prevPost) => ({
             ...prevPost,
             gameId: -1,
             gameName: '',
@@ -81,13 +74,13 @@ const CreatePost = () => {
     const togglePlatformSelection = (platform: string) => {
         /*if the button pressed is already included then remove it from the list of selected
             platforms otherwise add it to the list*/
-        if (post.platforms.includes(platform)) {
-            setPost((prevPost) => ({
+        if (updatedPost.platforms.includes(platform)) {
+            setUpdatedPost((prevPost) => ({
                 ...prevPost,
                 platforms: prevPost.platforms.filter(p => p !== platform),
             }))
         } else {
-            setPost((prevPost) => ({
+            setUpdatedPost((prevPost) => ({
                 ...prevPost,
                 platforms: [...prevPost.platforms, platform],
             }))
@@ -98,13 +91,22 @@ const CreatePost = () => {
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
 
+        if (updatedPost.gameId === -1) {
+            toast.error('No game selected please select a game.', { toastId: 2 });
+            return;
+        }
+
+        if (updatedPost.platforms.length === 0) {
+            toast.error('No platforms selected please select a platform.', {toastId: 1});
+            return;
+        }
+
         const postData = {
-            platformIds: post.platforms,
-            gameId: post.gameId,
-            description: post.description,
+            platformIds: updatedPost.platforms,
+            gameId: updatedPost.gameId,
+            description: updatedPost.description,
         };
 
-        setIsLoading(true);
         setError(null);
 
         try {
@@ -124,13 +126,11 @@ const CreatePost = () => {
 
             console.log('Post created successfully:', response);
 
-            setPost({ gameId: -1, gameName: '', platforms: [], description: '' });
+            setUpdatedPost({ gameId: -1, gameName: '', platforms: [], description: '' });
             setPlatforms([]);
             navigate('/yourPost');
         } catch {
             setError('Failed to create post. Please try again later.');
-        } finally {
-            setIsLoading(false);
         }
         
     }
@@ -163,8 +163,8 @@ const CreatePost = () => {
                 <h2 className="text-xl font-semibold mb-4">Choose Game</h2>
                 <GameSearch filterByGame={chooseGame}/>
 
-                <h2 className="text-xl font-semibold mb-4 mt-6">Select Platforms for {post.gameName}</h2>
-                {post.gameName && (
+                <h2 className="text-xl font-semibold mb-4 mt-6">Select Platforms for {updatedPost.gameName}</h2>
+                {updatedPost.gameName && (
                     <button 
                         onClick={clearGame}
                         className="text-m text-red-500 hover:text-red-700 font-semibold"
@@ -180,7 +180,7 @@ const CreatePost = () => {
                             onClick={() => togglePlatformSelection(platform)}
                             className={`w-full py-2 px-4 rounded-lg border transition-colors ${
                                 platforms.includes(platform)
-                                    ? post.platforms.includes(platform) ? 'bg-green-600 text-white' : 'bg-blue-800'
+                                    ? updatedPost.platforms.includes(platform) ? 'bg-green-600 text-white' : 'bg-blue-800'
                                     : 'bg-gray-600 text-gray-300'
                             } ${
                                 !platforms.includes(platform) ? 'cursor-not-allowed' : ''
@@ -189,7 +189,7 @@ const CreatePost = () => {
                             disabled={!platforms.includes(platform)}
                                     
                         >
-                            {platform} {post.platforms.includes(platform) && '✓'}
+                            {platform} {updatedPost.platforms.includes(platform) && '✓'}
                         </button>
                     ))}
                 </div>
@@ -198,7 +198,7 @@ const CreatePost = () => {
                 <div className="mt-4">
                     <h3 className="text-lg font-semibold mb-2">Selected Platforms</h3>
                     <ul>
-                        {post.platforms.map(platform => (
+                        {updatedPost.platforms.map(platform => (
                             <li key={platform}>{platform}</li>
                         ))}
                     </ul>
@@ -208,8 +208,8 @@ const CreatePost = () => {
                 <label htmlFor="description" className="block text-lg font-medium mb-2">Description</label>
                 <textarea
                     id="description"
-                    value={post.description}
-                    onChange={(e) => setPost((prevPost) => ({...prevPost, description: e.target.value,}))}
+                    value={updatedPost.description}
+                    onChange={(e) => setUpdatedPost((prevPost) => ({...prevPost, description: e.target.value,}))}
                     rows={6}
                     placeholder="Enter your description here..."
                     className="w-full px-4 py-2 rounded-lg bg-slate-400 border border-slate-300 text-slate-100 placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -220,8 +220,9 @@ const CreatePost = () => {
                     <button 
                         onClick={handleSubmit} 
                         className="py-2 px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-md focus:outline-none focus:ring-2 fodus:ring-blue-500"
+                        disabled={isLoadingCreate || isLoadingFetch}
                     >
-                        {isLoading ? 'Submitting...' : 'Create Post'}
+                        {isLoadingFetch || isLoadingCreate || isLoadingDelete ? 'Submitting...' : 'Create Post'}
                     </button>
                     {error && <p className="text-red-500 mt-2">{error}</p>}
                 </div>
