@@ -182,7 +182,11 @@ const Homepage = () => {
       {posts ? (
         <ul className='space-y-6 flex flex-col items-center'>
           {posts.map((post: Post) => {
-            const isPostAccepted = acceptedPosts.some((accepted: AcceptedPost) => accepted.postId === post.postId);
+            let isPostAccepted = false;
+            if (acceptedPosts) {
+              isPostAccepted = acceptedPosts.some((accepted: AcceptedPost) => accepted.postId === post.postId);
+            }
+            
 
             return (
               <li key={post.postId} className="bg-slate-500 p-2 rounded-lg shadow w-full max-w-md">

@@ -9,10 +9,17 @@ const Register = () => {
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
 
+    const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/;
+
     //will register a user based on the provided credentials
     //NEED MORE COMPREHENSIVE ERROR MESSAGES WHEN FAILED REGISTRATION
     const handleRegister = async (e: React.FormEvent) => {
       e.preventDefault();
+
+      if (!strongPasswordRegex.test(password)) {
+        toast.error('Password must be at least 6 characters long, contain an uppercase letter, a number, and a special character.', {toastId: '8'});
+        return;
+      }
   
       try {
         await registerUser(username, email, password);
