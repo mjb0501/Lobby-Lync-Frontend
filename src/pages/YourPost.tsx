@@ -2,6 +2,7 @@ import { formatDate } from "../utils/formatDate";
 import { useNavigate } from "react-router-dom";
 import { useUserPost } from "../hooks/fetchUserPost";
 import { useDeletePost } from "../hooks/deleteUserPost";
+import { useDeleteAcceptAsCreator } from "../hooks/deletePostAcceptanceAsCreator";
 
 interface Acceptance {
     username: string;
@@ -13,6 +14,7 @@ interface Acceptance {
 const YourPost = () => {
     const { data: post, isLoading: isLoadingFetch } = useUserPost();
     const { mutateAsync: deletePost, isLoading: isLoadingDelete } = useDeletePost();
+    const { mutateAsync: rejectAcceptance, isLoading: isLoadingReject } = useDeleteAcceptAsCreator();
     const navigate = useNavigate();
 
     if (isLoadingFetch) return <p>Loading...</p>
@@ -23,6 +25,14 @@ const YourPost = () => {
             await deletePost();
         } catch {
             alert('Failed to delete post.');
+        }
+    }
+
+    const handleReject = async (username: string, postId: number) => {
+        try {
+            await rejectAcceptance({username, postId});
+        } catch {
+            alert('Failed to reject post.');
         }
     }
 
@@ -77,6 +87,13 @@ const YourPost = () => {
                                     ) : (
                                         <p className="mt-2 text-lg"><strong>Platform:</strong> {acceptance.platform}</p>
                                     )}
+                                    <button
+                                        className="w-40 py-2 px-6 mt-4 bg-red-600 hover:bg-red-700 text-white rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                                        onClick={() => handleReject(acceptance.username, post.postId)}
+                                        disabled={isLoadingReject}
+                                    >
+                                        Reject
+                                    </button>
                                 </li>
                             ))
                         ) : (

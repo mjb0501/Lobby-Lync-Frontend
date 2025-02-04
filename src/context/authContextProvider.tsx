@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState } from "react"
 import { getCurrentUser, logoutUser } from "../services/authServices";
 import { ContextType, UserType } from "../types";
 import { useNavigate } from "react-router-dom";
+import { useQueryClient } from "react-query";
 
 export const INITIAL_USER = {
     id: '',
@@ -27,6 +28,8 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [isLoading, setIsLoading] = useState(true);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
 
+    const queryClient = useQueryClient();
+
     const navigate = useNavigate();
 
     const checkAuthUser = async () => {
@@ -41,6 +44,8 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                     platforms: currentAccount[0].platforms || {},
                 })
 
+                await queryClient.invalidateQueries();
+                await queryClient.refetchQueries();
 
                 setIsAuthenticated(true);
 
@@ -57,6 +62,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     const logout = async () => {
+        queryClient.clear();
         setUser(INITIAL_USER);
         setIsAuthenticated(false);
         document.cookie = 'accessToken=; Max-Age=-1; path=/';

@@ -66,6 +66,15 @@ export const deletePostAcceptance = async (postId: number) => {
     }
 }
 
+export const rejectPostAcceptance = async (acceptData: { username: string, postId: number }) => {
+    try {
+        const { username, postId } = acceptData;
+        await axios.delete(`/posts/rejectPostAcceptance`, {data: {username, postId}});
+    } catch (error) {
+        console.log(error);
+    }
+}
+
 export const editPost = async (postData: {postId: number, platformIds: string[], gameId: number, description: string}) => {
     try {
         await axios.put(`/posts/updatePost`, postData)
