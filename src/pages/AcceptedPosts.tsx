@@ -2,6 +2,7 @@ import { formatDate } from '../utils/formatDate';
 import { useGetAcceptedPosts } from '../hooks/fetchAcceptedPosts';
 import { useDeleteAccept } from '../hooks/deletePostAcceptance';
 import { ToastContainer, toast } from 'react-toastify';
+import { MessageModal } from '../components/MessageModal';
 
 interface AcceptedPost {
     postId: number;
@@ -10,6 +11,7 @@ interface AcceptedPost {
     description: string;
     createdAt: string;
     platforms: string[];
+    conversationId: number;
 }
 
 const AcceptedPosts = () => {
@@ -58,8 +60,10 @@ const AcceptedPosts = () => {
                                 {/* Description */}
                                 <h2 className="text-xl font-bold mb-2">{post.description}</h2>
                     
+                                <MessageModal conversationId={post.conversationId} />
+
                                 <button
-                                    className="w-30  py-4 px-6 mt-4 bg-red-600 hover:bg-red-700 text-white rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                                    className="ml-5 w-40  py-2 px-6 mt-4 bg-red-600 hover:bg-red-700 text-white rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-red-500"
                                     onClick={() => {handleDelete(post.postId)}}
                                     disabled={isLoadingDelete}
                                 >

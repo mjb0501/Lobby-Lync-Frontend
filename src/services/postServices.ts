@@ -20,7 +20,7 @@ export const createPost = async (postData: { platformIds: string[], gameId: numb
     }
 };
 
-export const acceptPost = async (acceptData: {postId: number, description: string, platform: string, platformUsername: string}) => {
+export const acceptPost = async (acceptData: {postId: number, description: string, platform: string, platformUsername: string, creatorId: number }) => {
     try {
         const response = await axios.post(`/posts/acceptPost`, acceptData);
         return response.data

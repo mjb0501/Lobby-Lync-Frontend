@@ -3,12 +3,14 @@ import { useNavigate } from "react-router-dom";
 import { useUserPost } from "../hooks/fetchUserPost";
 import { useDeletePost } from "../hooks/deleteUserPost";
 import { useDeleteAcceptAsCreator } from "../hooks/deletePostAcceptanceAsCreator";
+import { MessageModal } from "../components/MessageModal";
 
 interface Acceptance {
     username: string;
     description: string;
     platform: string;
     platformUsername?: string;
+    conversationId: number;
 }
 
 const YourPost = () => {
@@ -82,13 +84,17 @@ const YourPost = () => {
                                 <li key={acceptance.username} className="bg-gray-700 p-4 rounded-lg">
                                     <p className="text-lg"><strong>Username:</strong> {acceptance.username}</p>
                                     <p className="mt-2 text-lg"><strong>Description:</strong> {acceptance.description}</p>
+                                    <p className="mt-2 text-lg"><strong>ConversationId:</strong> {acceptance.conversationId}</p>
                                     {acceptance.platformUsername ? (
                                         <p className="mt-2 text-lg"><strong>{acceptance.platform}:</strong> {acceptance.platformUsername}</p>
                                     ) : (
                                         <p className="mt-2 text-lg"><strong>Platform:</strong> {acceptance.platform}</p>
                                     )}
+                                    
+                                    <MessageModal conversationId={acceptance.conversationId} />
+
                                     <button
-                                        className="w-40 py-2 px-6 mt-4 bg-red-600 hover:bg-red-700 text-white rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                                        className="ml-5 w-40 py-2 px-6 mt-4 bg-red-600 hover:bg-red-700 text-white rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-red-500"
                                         onClick={() => handleReject(acceptance.username, post.postId)}
                                         disabled={isLoadingReject}
                                     >

@@ -9,6 +9,7 @@ import { useAcceptPost } from '../hooks/createPostAcceptance';
 
 interface Post {
   postId: number;
+  userId: number;
   user: string;
   game: string;
   description: string;
@@ -32,17 +33,6 @@ const Homepage = () => {
   const { mutateAsync: acceptPost, isLoading: isLoadingAccept } = useAcceptPost();
   //used to check whether user is logged in
   const { user } = useUserContext();
-  //used to prevent the user from seeing incorrect content before authorization has been propagated
-  //const [loading, setLoading] = useState<boolean>(true);
-  //used to hold the array of posts to be shown on the home page
-  //const [ posts, setPosts ] = useState<Post[]>([]);
-  //used to determine which posts the user has already accepted to prevent accepting multiple times
-  //const [acceptedPosts, setAcceptedPosts] = useState<AcceptedPost[]>([]);
-  //MAY WANT TO REMOVE, used to hold the error occurring
-  //const [error, setError] = useState<string | null>(null);
-  //used to specify which filters have been applied to the posts
-  //const [gameName, setGameName] = useState<string | null>(null);
-
 
   const [showModal, setShowModal] = useState<boolean>(false);
   const [description, setDescription] = useState<string>('');
@@ -51,39 +41,7 @@ const Homepage = () => {
   const [selectedPlatform, setSelectedPlatform] = useState<string>('');
   const [platformWarning, setPlatformWarning] = useState<string>('');
 
-    //on loading website fetch the posts
-    // useEffect(() => {
-    //   fetchAcceptedPosts();
-    //   //fetchPosts();
-    // }, []);
-
     if (isLoadingFetch || isLoadingAcceptedPosts) return <p>Loading...</p>
-
-  //will try and fetch the posts, can also be provided a game name to filter the results
-  // const fetchPosts = async (filter?: { gameName?: string }) => {
-  //   try {
-  //     //can call getPosts with either a filter or nothing
-  //     const data = await getPosts(filter || {});
-  //     setPosts(data);
-  //   } catch {
-  //     setError('Failed to load posts');
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // }
-
-  // const fetchAcceptedPosts = async () => {
-  //   try {
-  //     const posts = await getAcceptedPosts();
-  //     if (posts) {
-  //       setAcceptedPosts(posts);
-  //     }
-  //   } catch {
-  //     setError('Failed while trying to get accepted posts')
-  //   }
-  // }
-
-
 
   //This function is passed to the gameSearchBar to filter the posts on the homepage
   const filterByGame = (game: string) => {
@@ -93,13 +51,11 @@ const Homepage = () => {
 
   const removeGameFilter = () => {
     setGameName(null);
-    //fetchPosts();
   }
 
   const handleAcceptPost = async (post: Post) => {
     if (!user.id) {
       toast.info("Need to be logged in to accept post", {toastId: "1"})
-      //navigate('/login');
       return;
     }
 
@@ -132,11 +88,16 @@ const Homepage = () => {
 
   const handleSubmitAcceptance = async () => {
     try {
+
+      if (!chosenPost) {
+        return;
+      }
       const acceptData = {
         postId: postIdToAccept,
         description: description,
         platform: selectedPlatform,
         platformUsername: user.platforms[selectedPlatform],
+        creatorId: chosenPost.userId,
       };
 
       await acceptPost(acceptData);
@@ -148,12 +109,6 @@ const Homepage = () => {
       toast.error('Failed to accept post', {toastId: "3"})
     }
   };
-
-
-
-  //will display this if the authentication data is still propagating
-  //if (loading) return <div>Loading...</div>;
-  //if (error) return <div>{error}</div>
 
   return (
     <div className='container mx-auto max-w-7xl'>
