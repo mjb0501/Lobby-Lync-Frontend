@@ -4,6 +4,7 @@ import { useUserPost } from "../hooks/fetchUserPost";
 import { useDeletePost } from "../hooks/deleteUserPost";
 import { useDeleteAcceptAsCreator } from "../hooks/deletePostAcceptanceAsCreator";
 import { MessageModal } from "../components/MessageModal";
+import { useDeleteConversation } from "../hooks/deleteConversation";
 
 interface Acceptance {
     username: string;
@@ -17,6 +18,7 @@ const YourPost = () => {
     const { data: post, isLoading: isLoadingFetch } = useUserPost();
     const { mutateAsync: deletePost, isLoading: isLoadingDelete } = useDeletePost();
     const { mutateAsync: rejectAcceptance, isLoading: isLoadingReject } = useDeleteAcceptAsCreator();
+    const { mutateAsync: deleteConversation, isLoading: isDeletingConversation } = useDeleteConversation();
     const navigate = useNavigate();
 
     if (isLoadingFetch) return <p>Loading...</p>
@@ -30,9 +32,12 @@ const YourPost = () => {
         }
     }
 
-    const handleReject = async (username: string, postId: number) => {
+    const handleReject = async (username: string, postId: number, conversationId: number) => {
         try {
+            console.log(conversationId)
             await rejectAcceptance({username, postId});
+            await deleteConversation({conversationId});
+            localStorage.removeItem(`newMessageNotification_${conversationId}`);
         } catch {
             alert('Failed to reject post.');
         }
@@ -95,7 +100,8 @@ const YourPost = () => {
 
                                     <button
                                         className="ml-5 w-40 py-2 px-6 mt-4 bg-red-600 hover:bg-red-700 text-white rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                                        onClick={() => handleReject(acceptance.username, post.postId)}
+                                        onClick={() => 
+                                            handleReject(acceptance.username, post.postId, acceptance.conversationId)}
                                         disabled={isLoadingReject}
                                     >
                                         Reject

@@ -3,6 +3,7 @@ import { useGetAcceptedPosts } from '../hooks/fetchAcceptedPosts';
 import { useDeleteAccept } from '../hooks/deletePostAcceptance';
 import { ToastContainer, toast } from 'react-toastify';
 import { MessageModal } from '../components/MessageModal';
+import { useDeleteConversation } from '../hooks/deleteConversation';
 
 interface AcceptedPost {
     postId: number;
@@ -16,13 +17,16 @@ interface AcceptedPost {
 
 const AcceptedPosts = () => {
     const { data: acceptedPosts, isLoading: isLoadingAcceptPosts } = useGetAcceptedPosts();
-    const { mutateAsync: deletePostAcceptance, isLoading: isLoadingDelete } = useDeleteAccept(); 
+    const { mutateAsync: deletePostAcceptance, isLoading: isDeletingAccept } = useDeleteAccept();
+    const { mutateAsync: deleteConversation, isLoading: isDeletingConversation } = useDeleteConversation(); 
 
-    if (isLoadingAcceptPosts || isLoadingDelete) return <p>Loading...</p>
+    if (isLoadingAcceptPosts || isDeletingAccept) return <p>Loading...</p>
 
-    const handleDelete = async (postId: number) => {
+    const handleDelete = async (postId: number, conversationId: number) => {
         try {
             await deletePostAcceptance(postId);
+            await deleteConversation({conversationId});
+            localStorage.removeItem(`newMessageNotification_${conversationId}`);
             toast.success('Successfully Deleted Acceptance', {toastId: 1})
         } catch (error) {
             console.log(error);
@@ -64,8 +68,8 @@ const AcceptedPosts = () => {
 
                                 <button
                                     className="ml-5 w-40  py-2 px-6 mt-4 bg-red-600 hover:bg-red-700 text-white rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                                    onClick={() => {handleDelete(post.postId)}}
-                                    disabled={isLoadingDelete}
+                                    onClick={() => {handleDelete(post.postId, post.conversationId)}}
+                                    disabled={isDeletingConversation}
                                 >
                                     Delete
                                 </button>

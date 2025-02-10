@@ -16,6 +16,7 @@ import RootLayout from './pages/RootLayout.tsx';
 import AuthLayout from './pages/AuthLayout.tsx';
 import AcceptedPosts from './pages/AcceptedPosts.tsx';
 import EditPost from './pages/EditPost.tsx';
+import { WebSocketProvider } from './context/webSocketContext.tsx';
 
 axios.defaults.baseURL = 'http://localhost:3001';
 //console.log(process.env.REACT_APP_URL)
@@ -28,28 +29,30 @@ function App() {
     <Router>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <NavBar />
-          <Routes>
-            
-            {/* Public Routes */}
-            <Route element={<AuthLayout />}>
-              <Route path="/register" element={<Register />} />
-              <Route path="/login" element={<Login />} />
-            </Route>
+          <WebSocketProvider>
+            <NavBar />
+            <Routes>
+              
+              {/* Public Routes */}
+              <Route element={<AuthLayout />}>
+                <Route path="/register" element={<Register />} />
+                <Route path="/login" element={<Login />} />
+              </Route>
 
-            {/* Home is not in either because it can be accessed whether logged in or not */}
-            <Route path="/" element={<Homepage />} />
+              {/* Home is not in either because it can be accessed whether logged in or not */}
+              <Route path="/" element={<Homepage />} />
 
-            {/* Protected Routes */}
-            <Route element={<RootLayout />}>
-              <Route path="/createPost" element={<CreatePost />} />
-              <Route path="/editPost" element={<EditPost />} />
-              <Route path="/yourPost" element={<YourPost />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/editPlatforms" element={<EditPlatforms />} />
-              <Route path="/acceptedPosts" element={<AcceptedPosts />} />
-            </Route>
-          </Routes>
+              {/* Protected Routes */}
+              <Route element={<RootLayout />}>
+                <Route path="/createPost" element={<CreatePost />} />
+                <Route path="/editPost" element={<EditPost />} />
+                <Route path="/yourPost" element={<YourPost />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/editPlatforms" element={<EditPlatforms />} />
+                <Route path="/acceptedPosts" element={<AcceptedPosts />} />
+              </Route>
+            </Routes>
+          </WebSocketProvider>
         </AuthProvider>
       </QueryClientProvider>
     </Router>

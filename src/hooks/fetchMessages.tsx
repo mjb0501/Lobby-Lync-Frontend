@@ -7,6 +7,6 @@ export const useGetMessages = (conversationId: number) => {
     return useQuery({
         queryKey: [QUERY_KEYS.GET_MESSAGES, conversationId],
         queryFn: () => getMessages(conversationId),
-        refetchInterval: 3000,
+        //refetchInterval: 3000,
     });
 }

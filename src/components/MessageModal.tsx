@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useGetMessages } from "../hooks/fetchMessages";
-import { useSendMessage } from "../hooks/createMessage";
+// import { useSendMessage } from "../hooks/createMessage";
 import { useUserContext } from "../context/authContextProvider";
+import { useWebSocket } from "../context/webSocketContext";
 
 interface Message {
     id: number;
@@ -16,16 +17,82 @@ type MessageModalProps = {
 };
 
 export const MessageModal: React.FC<MessageModalProps> = ({ conversationId }) => {
-    const { data: messages, isLoading: isFetchingMessages } = useGetMessages(conversationId);
-    const { mutateAsync: sendNewMessage, isLoading: isSendingMessage } = useSendMessage();
+    const { data: messages, isLoading: isFetchingMessages, refetch } = useGetMessages(conversationId);
+    // const { mutateAsync: sendNewMessage, isLoading: isSendingMessage } = useSendMessage();
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
     const [newMessage, setNewMessage] = useState<string>('');
     const { user } = useUserContext();
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    const [messageReceived, setMessageReceived] = useState<boolean>(false);
 
-    const showNotificationRef = useRef(false);
-    const lastMessageCountRef = useRef(0);
-    const messagesLoadedRef = useRef(false);
+    //const socketRef = useRef<WebSocket | null>(null);
+
+    const ws = useWebSocket();
+
+    // const showNotificationRef = useRef(false);
+    // const lastMessageCountRef = useRef(0);
+    // const messagesLoadedRef = useRef(false);
+
+    useEffect(() => {
+        const storedMessageStatus = localStorage.getItem(`newMessageNotification_${conversationId}`)
+        if (storedMessageStatus === "true") {
+            setMessageReceived(true);
+        }
+        
+        if (ws) {
+            ws.send(JSON.stringify({ type: 'subscribe', conversationId }));
+
+            ws.onmessage = (event) => {
+                const message = JSON.parse(event.data);
+                console.log("message received");
+                setMessageReceived(true);
+                localStorage.setItem(`newMessageNotification_${message.conversationId}`, "true");
+                if (message.conversationId === conversationId) {
+                    refetch();
+                }
+            };
+
+            return () => {
+                ws.send(JSON.stringify({ type: 'unsubscribe', conversationId }));
+            }
+        }
+
+        
+        
+        // if (!socketRef.current) {
+        //     const ws = new WebSocket("ws://localhost:3001/ws");
+        //     socketRef.current = ws;
+
+        //     ws.onopen = () => {
+        //         console.log("WebSocket connected");
+        //         ws.send(JSON.stringify({ type: "subscribe", conversationId }));
+        //     };
+
+        //     ws.onmessage = (event) => {
+        //         const receivedMessage = JSON.parse(event.data);
+        //         setMessageReceived(true);
+        //         localStorage.setItem(`newMessageNotification_${conversationId}`, "true");
+        //         if (receivedMessage.conversationId === conversationId) {
+        //             refetch();
+        //         }
+        //     };
+
+        //     ws.onclose = () => {
+        //         console.log("WebSocket disconnected");
+        //     };
+
+        //     ws.onerror = (error) => {
+        //         console.error("Websocket error:", error);
+        //     }
+
+        //     return () => {
+        //         if (ws.readyState === WebSocket.OPEN) {
+        //             ws.send(JSON.stringify({ type: "unsubscribe", conversationId}));
+        //             ws.close();
+        //         }
+        //     }
+        // };
+    }, [ws, conversationId, refetch]);
 
     useEffect(() => {
         if (messagesEndRef.current) {
@@ -33,59 +100,79 @@ export const MessageModal: React.FC<MessageModalProps> = ({ conversationId }) =>
         }
     }, [isModalOpen, messages]);
 
-    useEffect(() => {
-        const storedNotification = localStorage.getItem(`newMessageNotification_${conversationId}`);
-        if (storedNotification == "true") {
-            showNotificationRef.current = true;
-        }
-    }, [conversationId]);
+    // useEffect(() => {
+    //     const storedNotification = localStorage.getItem(`newMessageNotification_${conversationId}`);
+    //     if (storedNotification == "true") {
+    //         showNotificationRef.current = true;
+    //     }
+    // }, [conversationId]);
 
-    useEffect(() => {
-        if ( !messages || !messages.messages) return;
+    // useEffect(() => {
+    //     if ( !messages || !messages.messages) return;
 
-        const currentMessageCount = messages.messages.length;
-        console.log(lastMessageCountRef.current)
+    //     const currentMessageCount = messages.messages.length;
+    //     console.log(lastMessageCountRef.current)
 
-        if (!messagesLoadedRef.current) {
-            lastMessageCountRef.current = currentMessageCount;
-            messagesLoadedRef.current = true;
-            return;
-        }
+    //     if (!messagesLoadedRef.current) {
+    //         lastMessageCountRef.current = currentMessageCount;
+    //         messagesLoadedRef.current = true;
+    //         return;
+    //     }
 
-        if (currentMessageCount > lastMessageCountRef.current) {
-            showNotificationRef.current = true;
-            lastMessageCountRef.current = currentMessageCount;
-            localStorage.setItem(`newMessageNotification_${conversationId}`, "true");
-        }
-    }, [messages, conversationId]);
-
-    if (isFetchingMessages) return <p>Loading...</p>
+    //     if (currentMessageCount > lastMessageCountRef.current) {
+    //         showNotificationRef.current = true;
+    //         lastMessageCountRef.current = currentMessageCount;
+    //         localStorage.setItem(`newMessageNotification_${conversationId}`, "true");
+    //     }
+    // }, [messages, conversationId]);
 
     const sendMessage = async (message: string) => {
         try {
-            const newMsg = {
-                conversationId: conversationId,
-                content: message
-            };
-            await sendNewMessage(newMsg);
-            setNewMessage("");
-            lastMessageCountRef.current = lastMessageCountRef.current + 1;
+            // const newMsg = {
+            //     conversationId: conversationId,
+            //     content: message
+            // };
+            // await sendNewMessage(newMsg);
+
+            if (ws) {
+                ws.send(JSON.stringify({
+                    type: 'message',
+                    conversationId,
+                    content: message,
+                    senderId: user.id,
+                }))
+            }
+            setNewMessage('');
+
+            // if (!socketRef.current || socketRef.current.readyState !== WebSocket.OPEN) return;
+
+            // setNewMessage("");
+            // socketRef.current.send(
+            //     JSON.stringify({
+            //         type: "message",
+            //         conversationId,
+            //         content: message,
+            //         senderId: user.id,
+            //     })
+            // )
         } catch (error) {
             console.log(error);
         }
     }
 
+        if (isFetchingMessages) return <p>Loading...</p>
+
     return (
         <>
             <button
-                className="w-40 py-2 px-4 bg-green-500 hover:bg-green-600 text-white rounded-lg"
+                className={`w-40 py-2 px-4 rounded-lg ${!messageReceived ? 'bg-green-500 hover:bg-green-600 text-white' : 'bg-yellow-500 hover:bg-yellow-600 text-white'}`}
                 onClick={() => {
                     setIsModalOpen(true);
-                    showNotificationRef.current = false;
+                    setMessageReceived(false)
                     localStorage.setItem(`newMessageNotification_${conversationId}`, "false");
                 }}
             >
-                Open Messages {showNotificationRef.current && "*New Message Received"}
+                { !messageReceived ? 'Open Messages' : 'New Message' }
             </button>
 
             {isModalOpen && (
@@ -126,7 +213,11 @@ export const MessageModal: React.FC<MessageModalProps> = ({ conversationId }) =>
                         <div className="flex justify-end space-x-2">
                             <button 
                                 className="bg-gray-400 px-4 py-2 rounded" 
-                                onClick={() => setIsModalOpen(false)}
+                                onClick={() => {
+                                    setIsModalOpen(false);
+                                    setMessageReceived(false);
+                                    localStorage.setItem(`newMessageNotification_${conversationId}`, "false");
+                                }}
                             >
                                 Cancel
                             </button>
@@ -137,7 +228,7 @@ export const MessageModal: React.FC<MessageModalProps> = ({ conversationId }) =>
                                         sendMessage(newMessage);
                                     }
                                 }}
-                                disabled={isSendingMessage}
+                                // disabled={isSendingMessage}
                             >
                                 Send
                             </button>
