@@ -1,4 +1,5 @@
-import { createContext, ReactNode, useContext, useEffect, useRef, useState } from 'react';
+import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
+import { useUserContext } from './authContextProvider';
 
 const WebSocketContext = createContext<WebSocket | null>(null);
 
@@ -8,8 +9,11 @@ interface WebSocketProviderProps {
 
 export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }) => {
     const [ws, setWs] = useState<WebSocket | null>(null);
+    const { isAuthenticated } = useUserContext();
 
     useEffect(() => {
+
+        if (!isAuthenticated) return;
 
         const socket = new WebSocket('ws://localhost:3001/ws');
 

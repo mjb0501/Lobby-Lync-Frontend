@@ -102,7 +102,7 @@ const YourPost = () => {
                                         className="ml-5 w-40 py-2 px-6 mt-4 bg-red-600 hover:bg-red-700 text-white rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-red-500"
                                         onClick={() => 
                                             handleReject(acceptance.username, post.postId, acceptance.conversationId)}
-                                        disabled={isLoadingReject}
+                                        disabled={isLoadingReject || isDeletingConversation}
                                     >
                                         Reject
                                     </button>
