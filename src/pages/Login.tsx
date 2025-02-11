@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { loginUser } from '../services/authServices';
 import { useUserContext } from '../context/authContextProvider';
 import { ToastContainer, toast } from 'react-toastify';
@@ -19,7 +19,7 @@ const Login = () => {
       await loginUser(email, password);
       //axios.defaults.withCredentials = true;
       await checkAuthUser();
-      navigate('/');
+      navigate('/posts');
     } catch (error) {
       console.error(error);
       toast.error('Login failed', {toastId: '5'});
@@ -70,6 +70,15 @@ const Login = () => {
             Login
           </button>
         </form>
+        <p className="mt-4">
+          Don't have an account. Register
+          <Link 
+            to="/register" 
+            className="ml-1 text-white hover:text-gray-300 font-semibold underline"
+          >
+            Here
+          </Link>
+        </p>
       </div>
     </div>
   );

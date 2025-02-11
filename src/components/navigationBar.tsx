@@ -9,7 +9,7 @@ export const NavBar = () => {
             <div className="max-w-7xl mx-auto px-4 flex justify-between items-center">
                 {/* Logo or Brand */}
                 <div className="text-2xl font-semibold">
-                    <Link to="/" className="hover:text-gray-400 transition-colors duration-300">
+                    <Link to={isAuthenticated ? "/posts" : "/"} className="hover:text-gray-400 transition-colors duration-300">
                         Home
                     </Link>
                 </div>

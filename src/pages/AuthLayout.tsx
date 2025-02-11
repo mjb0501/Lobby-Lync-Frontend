@@ -11,7 +11,7 @@ const AuthLayout = () => {
     }
 
     if(isAuthenticated) {
-        return <Navigate to="/" replace />
+        return <Navigate to="/posts" replace />
     }
 
   return (
