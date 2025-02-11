@@ -32,7 +32,7 @@ const Homepage = () => {
   const { data: acceptedPosts, isLoading: isLoadingAcceptedPosts } = useGetAcceptedPosts();
   const { mutateAsync: acceptPost, isLoading: isLoadingAccept } = useAcceptPost();
   //used to check whether user is logged in
-  const { user } = useUserContext();
+  const { user, isAuthenticated } = useUserContext();
 
   const [showModal, setShowModal] = useState<boolean>(false);
   const [description, setDescription] = useState<string>('');
@@ -138,7 +138,7 @@ const Homepage = () => {
         <ul className='space-y-6 flex flex-col items-center'>
           {posts.map((post: Post) => {
             let isPostAccepted = false;
-            if (acceptedPosts) {
+            if (acceptedPosts && isAuthenticated) {
               isPostAccepted = acceptedPosts.some((accepted: AcceptedPost) => accepted.postId === post.postId);
             }
             
