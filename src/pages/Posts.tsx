@@ -6,6 +6,7 @@ import { formatDate } from '../utils/formatDate';
 import { useGetPosts } from '../hooks/fetchAllPosts';
 import { useGetAcceptedPosts } from '../hooks/fetchAcceptedPosts';
 import { useAcceptPost } from '../hooks/createPostAcceptance';
+import { useWebSocket } from '../context/webSocketContext';
 
 interface Post {
   postId: number;
@@ -32,7 +33,8 @@ const Posts = () => {
   const { data: acceptedPosts, isLoading: isLoadingAcceptedPosts } = useGetAcceptedPosts();
   const { mutateAsync: acceptPost, isLoading: isLoadingAccept } = useAcceptPost();
   //used to check whether user is logged in
-  const { user, isAuthenticated } = useUserContext();
+  const { user } = useUserContext();
+  const { subscribeToConversation } = useWebSocket();
 
   const [showModal, setShowModal] = useState<boolean>(false);
   const [description, setDescription] = useState<string>('');
@@ -100,13 +102,14 @@ const Posts = () => {
         creatorId: chosenPost.userId,
       };
 
-      await acceptPost(acceptData);
+      const conversationId = await acceptPost(acceptData);
+      subscribeToConversation(conversationId);
       toast.success('Post accepted successfully', {toastId: "2"});
       setShowModal(false);
       setDescription('');
     } catch (error) {
       console.error('Error accepting post:', error);
-      toast.error('Failed to accept post', {toastId: "3"})
+      toast.error('Failed to accept post', {toastId: "3"});
     }
   };
 
@@ -120,7 +123,7 @@ const Posts = () => {
       />
 
       <h1 className='text-3xl font-bold mb-6 text-center'>
-        {user.username ? `Welcome ${user.username}!` : 'Welcome, please log in to continue.'}
+        {`Welcome ${user.username}!`}
       </h1>
       
       <div className='mb-4'>
@@ -134,11 +137,11 @@ const Posts = () => {
         </div>
       )}
 
-      {posts ? (
+      {posts[0] ? (
         <ul className='space-y-6 flex flex-col items-center'>
           {posts.map((post: Post) => {
             let isPostAccepted = false;
-            if (acceptedPosts && isAuthenticated) {
+            if (acceptedPosts) {
               isPostAccepted = acceptedPosts.some((accepted: AcceptedPost) => accepted.postId === post.postId);
             }
             

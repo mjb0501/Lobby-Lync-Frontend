@@ -14,3 +14,12 @@ export type UserType = {
     email: string;
     platforms: Record<string, string>;
 }
+
+export type WebSocketContextType = {
+    ws: WebSocket | null;
+    newMessage: boolean;
+    setNewMessage: React.Dispatch<React.SetStateAction<boolean>>;
+    subscribedConversations: Set<number>;
+    subscribeToConversation: (conversationId: number) => void;
+    unsubscribeFromConversation: (conversationId: number) => void;
+}

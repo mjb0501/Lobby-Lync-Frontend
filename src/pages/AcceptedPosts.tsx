@@ -4,6 +4,7 @@ import { useDeleteAccept } from '../hooks/deletePostAcceptance';
 import { ToastContainer, toast } from 'react-toastify';
 import { MessageModal } from '../components/MessageModal';
 import { useDeleteConversation } from '../hooks/deleteConversation';
+import { useWebSocket } from '../context/webSocketContext';
 
 interface AcceptedPost {
     postId: number;
@@ -18,7 +19,8 @@ interface AcceptedPost {
 const AcceptedPosts = () => {
     const { data: acceptedPosts, isLoading: isLoadingAcceptPosts } = useGetAcceptedPosts();
     const { mutateAsync: deletePostAcceptance, isLoading: isDeletingAccept } = useDeleteAccept();
-    const { mutateAsync: deleteConversation, isLoading: isDeletingConversation } = useDeleteConversation(); 
+    const { mutateAsync: deleteConversation, isLoading: isDeletingConversation } = useDeleteConversation();
+    const { unsubscribeFromConversation } = useWebSocket(); 
 
     if (isLoadingAcceptPosts || isDeletingAccept) return <p>Loading...</p>
 
@@ -26,6 +28,7 @@ const AcceptedPosts = () => {
         try {
             await deletePostAcceptance(postId);
             await deleteConversation({conversationId});
+            unsubscribeFromConversation(conversationId);
             localStorage.removeItem(`newMessageNotification_${conversationId}`);
             toast.success('Successfully Deleted Acceptance', {toastId: 1})
         } catch (error) {

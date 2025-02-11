@@ -24,32 +24,24 @@ export const MessageModal: React.FC<MessageModalProps> = ({ conversationId }) =>
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const [messageReceived, setMessageReceived] = useState<boolean>(false);
 
-    const ws = useWebSocket();
+    const {ws, newMessage: received, setNewMessage: 
+        setReceived, subscribedConversations, subscribeToConversation} = useWebSocket();
 
     useEffect(() => {
         const storedMessageStatus = localStorage.getItem(`newMessageNotification_${conversationId}`)
         if (storedMessageStatus === "true") {
             setMessageReceived(true);
+            refetch();
         }
+
+        console.log("NewMessage:", received);
         
         if (ws) {
-            ws.send(JSON.stringify({ type: 'subscribe', conversationId }));
-
-            ws.onmessage = (event) => {
-                const message = JSON.parse(event.data);
-                console.log("message received");
-                setMessageReceived(true);
-                localStorage.setItem(`newMessageNotification_${message.conversationId}`, "true");
-                if (message.conversationId === conversationId) {
-                    refetch();
-                }
-            };
-
-            return () => {
-                ws.send(JSON.stringify({ type: 'unsubscribe', conversationId }));
+            if (!subscribedConversations.has(conversationId)) {
+                subscribeToConversation(conversationId);
             }
         }
-    }, [ws, conversationId, refetch]);
+    }, [ws, conversationId, refetch, received, subscribeToConversation, subscribedConversations]);
 
     useEffect(() => {
         if (messagesEndRef.current) {
@@ -84,6 +76,7 @@ export const MessageModal: React.FC<MessageModalProps> = ({ conversationId }) =>
                     setIsModalOpen(true);
                     setMessageReceived(false)
                     localStorage.setItem(`newMessageNotification_${conversationId}`, "false");
+                    setReceived(false);
                 }}
             >
                 { !messageReceived ? 'Open Messages' : 'New Message' }

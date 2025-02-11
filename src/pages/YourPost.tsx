@@ -5,6 +5,7 @@ import { useDeletePost } from "../hooks/deleteUserPost";
 import { useDeleteAcceptAsCreator } from "../hooks/deletePostAcceptanceAsCreator";
 import { MessageModal } from "../components/MessageModal";
 import { useDeleteConversation } from "../hooks/deleteConversation";
+import { useWebSocket } from "../context/webSocketContext";
 
 interface Acceptance {
     username: string;
@@ -19,6 +20,7 @@ const YourPost = () => {
     const { mutateAsync: deletePost, isLoading: isLoadingDelete } = useDeletePost();
     const { mutateAsync: rejectAcceptance, isLoading: isLoadingReject } = useDeleteAcceptAsCreator();
     const { mutateAsync: deleteConversation, isLoading: isDeletingConversation } = useDeleteConversation();
+    const { unsubscribeFromConversation } = useWebSocket();
     const navigate = useNavigate();
 
     if (isLoadingFetch) return <p>Loading...</p>
@@ -37,6 +39,7 @@ const YourPost = () => {
             console.log(conversationId)
             await rejectAcceptance({username, postId});
             await deleteConversation({conversationId});
+            unsubscribeFromConversation(conversationId);
             localStorage.removeItem(`newMessageNotification_${conversationId}`);
         } catch {
             alert('Failed to reject post.');

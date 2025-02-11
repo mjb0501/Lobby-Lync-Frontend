@@ -23,7 +23,7 @@ export const createPost = async (postData: { platformIds: string[], gameId: numb
 export const acceptPost = async (acceptData: {postId: number, description: string, platform: string, platformUsername: string, creatorId: number }) => {
     try {
         const response = await axios.post(`/posts/acceptPost`, acceptData);
-        return response.data
+        return response.data.response.id as number;
     } catch (error) {
         console.error('Error accepting post:', error);
         throw error;

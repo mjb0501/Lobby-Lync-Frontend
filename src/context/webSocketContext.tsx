@@ -1,7 +1,8 @@
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { useUserContext } from './authContextProvider';
+import { WebSocketContextType } from '../types';
 
-const WebSocketContext = createContext<WebSocket | null>(null);
+const WebSocketContext = createContext<WebSocketContextType | null>(null);
 
 interface WebSocketProviderProps {
     children: ReactNode;
@@ -9,6 +10,8 @@ interface WebSocketProviderProps {
 
 export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }) => {
     const [ws, setWs] = useState<WebSocket | null>(null);
+    const [newMessage, setNewMessage] = useState<boolean>(false);
+    const [subscribedConversations, setSubscribedConversations] = useState<Set<number>>(new Set());
     const { isAuthenticated } = useUserContext();
 
     useEffect(() => {
@@ -29,6 +32,14 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
             console.error("WebSocket error:", error);
         };
 
+        socket.onmessage = (event) => {
+            const message = JSON.parse(event.data);
+            console.log("message received");
+            localStorage.setItem(`newMessageNotification_${message.conversationId}`, "true");
+            setNewMessage(true);
+            console.log("NewMessage");
+        }
+
         setWs(socket);
 
         return () => {
@@ -38,8 +49,26 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
         };
     }, [isAuthenticated]);
 
+    const subscribeToConversation = (conversationId: number) => {
+        if (ws) {
+            ws.send(JSON.stringify({type: "subscribe", conversationId }));
+            setSubscribedConversations((prev) => new Set([...prev, conversationId]));
+        }
+    };
+
+    const unsubscribeFromConversation = (conversationId: number) => {
+        if (ws) {
+            ws.send(JSON.stringify({type: "unsubscribe", conversationId }));
+            setSubscribedConversations((prev) => {
+                const newSet = new Set(prev);
+                newSet.delete(conversationId);
+                return newSet;
+            });
+        };
+    };
+
     return (
-        <WebSocketContext.Provider value={ws}>
+        <WebSocketContext.Provider value={{ws, newMessage, setNewMessage, subscribedConversations, subscribeToConversation, unsubscribeFromConversation }}>
             {children}
         </WebSocketContext.Provider>
     );
