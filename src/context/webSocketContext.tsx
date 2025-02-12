@@ -16,31 +16,43 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
 
     useEffect(() => {
 
-        if (!isAuthenticated) return;
-
-        const socket = new WebSocket('ws://localhost:3001/ws');
-
-        socket.onopen = () => {
-            console.log("WebSocket connected");
-        };
-
-        socket.onclose = () => {
-            console.log("WebSocket disconnected");
-        };
-
-        socket.onerror = (error) => {
-            console.error("WebSocket error:", error);
-        };
-
-        socket.onmessage = (event) => {
-            const message = JSON.parse(event.data);
-            console.log("message received");
-            localStorage.setItem(`newMessageNotification_${message.conversationId}`, "true");
-            setNewMessage(true);
-            console.log("NewMessage");
+        //starts the connection to the websocket and sets up its behavior
+        function start(websocketServerLocation: string) {
+            const socket = new WebSocket(websocketServerLocation);
+    
+            //send a messages saying connection on opening the connection
+            socket.onopen = () => {
+                console.log("WebSocket connected");
+            };
+    
+            //start a timeout that will reattempt to connect to the server every 5 seconds
+            socket.onclose = () => {
+                setTimeout(function(){start(websocketServerLocation)}, 5000);
+                console.log("Attempted reconnection");
+            };
+    
+            //on error send a console.error out
+            socket.onerror = (error) => {
+                console.error("WebSocket error:", error);
+            };
+    
+            //on message set new message to alert messageModal of incoming message
+            socket.onmessage = (event) => {
+                const message = JSON.parse(event.data);
+                console.log("message received");
+                localStorage.setItem(`newMessageNotification_${message.conversationId}`, "true");
+                setNewMessage(true);
+                console.log("NewMessage");
+            }
+    
+            setWs(socket);
+    
+            return socket;
         }
 
-        setWs(socket);
+        if (!isAuthenticated) return;
+
+        const socket = start('ws://localhost:3001/ws');
 
         return () => {
             if (socket.readyState === WebSocket.OPEN) {
@@ -49,6 +61,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
         };
     }, [isAuthenticated]);
 
+    //subscribes the user to a conversation, used when a new conversation is started
     const subscribeToConversation = (conversationId: number) => {
         if (ws) {
             ws.send(JSON.stringify({type: "subscribe", conversationId }));
@@ -56,6 +69,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
         }
     };
 
+    //unsubscribes user from conversation, used when a conversation is rejected or deleted
     const unsubscribeFromConversation = (conversationId: number) => {
         if (ws) {
             ws.send(JSON.stringify({type: "unsubscribe", conversationId }));

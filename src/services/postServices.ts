@@ -1,7 +1,8 @@
 import axios from 'axios';
 
-export const getPosts = async (params: { gameName?: string } = {}) => {
+export const getPosts = async (params: { gameName?: string | null, page?: number, limit?: number } = {}) => {
     try {
+        console.log("Get posts ran")
         const response = await axios.get(`/posts/getPosts`, { params });
         return response.data;
     } catch (error) {

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { GameSearch } from '../components/gameSearchBar';
 import { useUserContext } from '../context/authContextProvider';
 import { ToastContainer, toast } from 'react-toastify';
@@ -28,13 +28,17 @@ interface AcceptedPost {
 }
 
 const Posts = () => {
+  const [page, setPage] = useState<number>(1);
+  const limit = 10;
+
   const [gameName, setGameName] = useState<string | null>(null);
-  const { data: posts, isLoading: isLoadingFetch } = useGetPosts(gameName);
+  const { data: fetchedPosts, isLoading: isLoadingFetch } = useGetPosts(gameName, page, limit);
   const { data: acceptedPosts, isLoading: isLoadingAcceptedPosts } = useGetAcceptedPosts();
   const { mutateAsync: acceptPost, isLoading: isLoadingAccept } = useAcceptPost();
   //used to check whether user is logged in
   const { user } = useUserContext();
   const { subscribeToConversation } = useWebSocket();
+  const [posts, setPosts] = useState<Post[]>([]);
 
   const [showModal, setShowModal] = useState<boolean>(false);
   const [description, setDescription] = useState<string>('');
@@ -43,7 +47,30 @@ const Posts = () => {
   const [selectedPlatform, setSelectedPlatform] = useState<string>('');
   const [platformWarning, setPlatformWarning] = useState<string>('');
 
-    if (isLoadingFetch || isLoadingAcceptedPosts) return <p>Loading...</p>
+  useEffect(() => {
+    if (!isLoadingFetch) {
+      setPosts(fetchedPosts.posts)
+    }
+    console.log(fetchedPosts)
+  }, [fetchedPosts, isLoadingFetch])
+
+  if (isLoadingFetch || isLoadingAcceptedPosts) return <p>Loading...</p>
+
+  const handleNextPage = () => {
+    console.log("Ran next")
+    console.log(posts[0])
+    if (posts && posts.length === limit) {
+      setPage(prev => prev + 1);
+    }
+    console.log(page);
+  };
+
+  const handlePreviousPage = () => {
+    console.log("Ran previous")
+    if (page > 1) {
+      setPage(prev => prev - 1);
+    }
+  }
 
   //This function is passed to the gameSearchBar to filter the posts on the homepage
   const filterByGame = (game: string) => {
@@ -137,7 +164,7 @@ const Posts = () => {
         </div>
       )}
 
-      {posts[0] ? (
+      {posts?.length > 0 ? (
         <ul className='space-y-6 flex flex-col items-center'>
           {posts.map((post: Post) => {
             let isPostAccepted = false;
@@ -178,6 +205,23 @@ const Posts = () => {
       ) : (
         <p className="text-center">No posts currently exist.</p>
       )}
+
+      <div className="flex justify-center space-x-4 mt-4">
+        <button
+          className="btn btn-secondary"
+          onClick={handlePreviousPage}
+          disabled={page === 1}
+        >
+          Previous
+        </button>
+        <button
+          className="btn btn-primary"
+          onClick={handleNextPage}
+          disabled={!posts || posts.length < limit}
+        >
+          Next
+        </button>
+      </div>
 
       {/* Modal for accepting the post and adding a description */}
       {showModal && (
