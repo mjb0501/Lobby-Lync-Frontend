@@ -65,6 +65,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         queryClient.clear();
         setUser(INITIAL_USER);
         setIsAuthenticated(false);
+        localStorage.clear();
         document.cookie = 'accessToken=; Max-Age=-1; path=/';
         await logoutUser();
         navigate('/login');

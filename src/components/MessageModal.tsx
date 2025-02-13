@@ -61,6 +61,7 @@ export const MessageModal: React.FC<MessageModalProps> = ({ conversationId }) =>
                 }))
             }
             setNewMessage('');
+            refetch();
         } catch (error) {
             console.log(error);
         }
