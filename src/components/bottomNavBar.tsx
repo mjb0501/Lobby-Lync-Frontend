@@ -32,24 +32,23 @@ const bottomBarLinks = [
 
 const BottomNavBar = () => {
     const { pathname } = useLocation();
-    const { isAuthenticated, logout }  = useUserContext();
-    console.log("Bottom bar: ", isAuthenticated, pathname);
+    const { isAuthenticated }  = useUserContext();
 
     return (
         isAuthenticated && (
-            <section className="mt-4 bg-slate-800 text-white py-4 shadow-md rounded-md mb-5 hidden max-[549px]:flex justify-between items-center sticky">
+            <section className="bg-slate-800 text-white py-4 shadow-md hidden max-[549px]:flex items-center fixed bottom-0 left-0 right-0">
                 {bottomBarLinks.map((link) => {
                     const isActive = pathname === link.route;
                     return (
                         <Link
                             to={link.route}
                             key={link.label}
-                            className={`${isActive && 'bg-slate-900 rounded-[10px] pointer-events-none'} flex-center items-center flex-col gap-1 p-2 transition`}
+                            className={`${isActive && 'bg-slate-900 rounded-[10px] pointer-events-none'} flex-center justify-center flex-col gap-1 p-2 transition`}
                         >
                             <img 
                                 src={link.imgURL}
                                 alt={link.label}
-                                className="invert"
+                                className="invert mx-auto"
                             />
                             <p className="text-xs text-white">{link.label}</p>
                         </Link>

@@ -149,10 +149,10 @@ const CreatePost = () => {
 
                 { preexistingPost ? (
                     <div className="bg-red-500 rounded-lg">
-                        <h2 className="text-white text-5xl">
+                        <h2 className="text-white text-2xl sm:text-5xl font-semibold">
                             Warning!
                         </h2>
-                        <h2 className="text-white text-base font-semibold">
+                        <h2 className="text-white text-sm sm:text-md font-semibold">
                             You are only allowed to create one post at a time. 
                             Creating a new post will delete your old one.
                         </h2>
@@ -163,11 +163,11 @@ const CreatePost = () => {
                 <h2 className="text-xl font-semibold mb-4">Choose Game</h2>
                 <GameSearch filterByGame={chooseGame}/>
 
-                <h2 className="text-xl font-semibold mb-4 mt-6">Select Platforms for {updatedPost.gameName}</h2>
+                <h2 className="text-md font-semibold mb-4 mt-6 sm:text-xl">Select Platforms for {updatedPost.gameName}</h2>
                 {updatedPost.gameName && (
                     <button 
                         onClick={clearGame}
-                        className="text-m text-red-500 hover:text-red-700 font-semibold"
+                        className="text-m text-white bg-red-500 p-1 sm:p-2 rounded-lg font-semibold"
                     >
                         Clear Game
                     </button>
@@ -178,12 +178,12 @@ const CreatePost = () => {
                         <button
                             key={platform}
                             onClick={() => togglePlatformSelection(platform)}
-                            className={`w-full py-2 px-4 rounded-lg border transition-colors ${
+                            className={`w-full p-1 rounded-lg border transition-colors text-sm sm:text-md ${
                                 platforms.includes(platform)
                                     ? updatedPost.platforms.includes(platform) ? 'bg-green-600 text-white' : 'bg-blue-800'
                                     : 'bg-gray-600 text-gray-300'
                             } ${
-                                !platforms.includes(platform) ? 'cursor-not-allowed' : ''
+                                !platforms.includes(platform) && 'cursor-not-allowed'
                             }`}
                             //disable button if platform is not associated with game
                             disabled={!platforms.includes(platform)}
@@ -195,14 +195,14 @@ const CreatePost = () => {
                 </div>
                         
                 {/* Selected Platforms */}
-                <div className="mt-4">
+                {/* <div className="mt-4">
                     <h3 className="text-lg font-semibold mb-2">Selected Platforms</h3>
-                    <ul>
+                    <ul className="text-sm sm:text-md">
                         {updatedPost.platforms.map(platform => (
                             <li key={platform}>{platform}</li>
                         ))}
                     </ul>
-                </div>
+                </div> */}
 
                 {/* Description Input */}
                 <label htmlFor="description" className="block text-lg font-medium mb-2">Description</label>

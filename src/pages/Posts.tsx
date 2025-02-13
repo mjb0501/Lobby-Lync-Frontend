@@ -178,18 +178,18 @@ const Posts = () => {
 
                 {/* Game Name and Created At */}
                 <div className="flex justify-between">
-                  <h2 className="text-xl font-bold">{post.game}</h2>
-                  <span className="text-sm">{formatDate(post.createdAt)}</span>
+                  <h2 className="text-md font-bold text-left sm:text-xl">{post.game}</h2>
+                  <span className="text-xs sm:text-sm">{formatDate(post.createdAt)}</span>
                 </div>
 
                 {/* Post Creator and Platforms */}
-                <div className="flex justify-between items-center text-sm mb-4">
+                <div className="flex justify-between items-center text-sm sm:text-lg mb-4">
                   <span>{post.user}</span>
                   <span>{post.platforms.join(', ')}</span>
                 </div>
 
                 {/* Description */}
-                <h2 className="text-xl font-bold mb-2">{post.description}</h2>
+                <h2 className="text-md sm:text-xl mb-2">{post.description}</h2>
 
                 <button
                   className={`btn mt-4 ${isPostAccepted ? 'bg-gray-700 cursor-not-allowed' : 'btn-primary'}`}
@@ -208,18 +208,18 @@ const Posts = () => {
 
       <div className="flex justify-center space-x-4 mt-4">
         <button
-          className="btn btn-secondary"
+          className="btn btn-secondary text-sm sm:text-lg"
           onClick={handlePreviousPage}
           disabled={page === 1}
         >
-          Previous
+          Previous Page
         </button>
         <button
-          className="btn btn-primary"
+          className="btn btn-primary text-sm sm:text-lg"
           onClick={handleNextPage}
           disabled={!posts || posts.length < limit}
         >
-          Next
+          Next Page
         </button>
       </div>
 
