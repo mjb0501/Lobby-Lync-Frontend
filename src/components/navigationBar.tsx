@@ -5,13 +5,11 @@ export const NavBar = () => {
     const { isAuthenticated, logout }  = useUserContext();
   
     return (
-        <nav className="bg-slate-800 text-white py-4 shadow-md rounded-md mb-5">
+        <nav className="bg-slate-800 text-white py-4 shadow-md rounded-md mb-5 hidden min-[550px]:block">
             <div className="max-w-7xl mx-auto px-4 flex justify-between items-center">
                 {/* Logo or Brand */}
                 <div className="text-2xl font-semibold">
-                    <Link to={isAuthenticated ? "/posts" : "/"} className="hover:text-gray-400 transition-colors duration-300">
-                        Home
-                    </Link>
+                    
                 </div>
 
                 {/* Navigation Links */}
@@ -25,6 +23,9 @@ export const NavBar = () => {
                         ) : (
                         <>
                         {/* Links for authenticated users */}
+                            <Link to={isAuthenticated ? "/posts" : "/"} className="hover:text-gray-400 transition-colors duration-300">
+                                Home
+                            </Link>
                             <Link to="/createPost" className="hover:text-gray-400 transition-colors duration-300">Create Post</Link>
                             <Link to="/yourPost" className="hover:text-gray-400 transition-colors duration-300">Your Post</Link>
                             <Link to="/acceptedPosts" className="hover:text-gray-400 transition-colors duration-300">Accepted Posts</Link>

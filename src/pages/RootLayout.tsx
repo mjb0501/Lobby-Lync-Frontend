@@ -1,3 +1,4 @@
+import BottomNavBar from '../components/bottomNavBar';
 import { useUserContext } from '../context/authContextProvider'
 import { Navigate, Outlet } from 'react-router-dom';
 
@@ -17,6 +18,8 @@ const RootLayout = () => {
   return (
     <div>
         <Outlet />
+
+        <BottomNavBar />
     </div>
   )
 }

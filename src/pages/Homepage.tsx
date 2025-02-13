@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 
 const Homepage = () => {
   return (
-    <div className="min-h-screen bg-slate-600 flex items-start justify-center py-44">
+    <div className="bg-slate-600 flex items-start justify-center py-44">
         <div className="bg-slate-500 rounded-lg shadow-lg p-8 w-full max-w-md">
             <h1 className="text-5xl font-bold mb-4 text-white">Welcome to Grouply</h1>
             <p className="text-lg text-gray-300 mb-6">

@@ -136,7 +136,7 @@ const CreatePost = () => {
     }
 
     return (
-        <div className="min-h-screen bg-slate-600 text-white flex flex-col items-center py-8">
+        <div className="bg-slate-600 text-white flex flex-col items-center py-8">
                     
             <ToastContainer 
                 position="top-center"

@@ -37,7 +37,7 @@ const AcceptedPosts = () => {
     }
 
   return (
-    <div className="min-h-screen bg-slate-600 text-white py-8 px-4">
+    <div className="bg-slate-600 text-white py-8 px-4">
 
         <ToastContainer 
             position="top-center"
