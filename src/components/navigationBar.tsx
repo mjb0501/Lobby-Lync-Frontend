@@ -8,12 +8,12 @@ export const NavBar = () => {
         <nav className="bg-slate-800 text-white py-4 shadow-md rounded-md mb-5 hidden min-[550px]:block">
             <div className="max-w-7xl mx-auto px-4 flex justify-between items-center">
                 {/* Logo or Brand */}
-                <div className="text-2xl font-semibold">
+                {/* <div className="text-2xl font-semibold">
                     
-                </div>
+                </div> */}
 
                 {/* Navigation Links */}
-                <div className="space-x-6 flex items-center">
+                <div className="space-x-6 flex items-center justify-between w-full">
                     {/* Links for unauthenticated users */}
                     {!isAuthenticated ? (
                         <>

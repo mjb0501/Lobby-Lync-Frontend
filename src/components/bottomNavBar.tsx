@@ -36,7 +36,7 @@ const BottomNavBar = () => {
 
     return (
         isAuthenticated && (
-            <section className="bg-slate-800 text-white py-4 shadow-md hidden max-[549px]:flex items-center fixed bottom-0 left-0 right-0">
+            <section className="bg-slate-800 text-white py-4 px-1 shadow-md hidden max-[549px]:flex items-center w-full justify-between fixed bottom-0 left-0 right-0">
                 {bottomBarLinks.map((link) => {
                     const isActive = pathname === link.route;
                     return (

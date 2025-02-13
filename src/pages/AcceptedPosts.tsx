@@ -37,7 +37,8 @@ const AcceptedPosts = () => {
     }
 
   return (
-    <div className="bg-slate-600 text-white py-8 px-4">
+    <div className="container mx-auto max-w-7xl">
+        <div className="space-y-6 flex flex-col items-center">
 
         <ToastContainer 
             position="top-center"
@@ -49,35 +50,35 @@ const AcceptedPosts = () => {
 
             {acceptedPosts.length > 0 ? (
                 <ul className='space-y-6 flex flex-col items-center'>
-                          {acceptedPosts.map((post: AcceptedPost) => (
+                        {acceptedPosts.map((post: AcceptedPost) => (
                             <li key={post.postId} className="bg-slate-500 p-2 rounded-lg shadow w-full max-w-md">
                 
                                 {/* Game Name and Created At */}
                                 <div className="flex justify-between">
-                                    <h2 className="text-xl font-bold">{post.game}</h2>
-                                    <span className="text-sm">{formatDate(post.createdAt)}</span>
+                                    <h2 className="text-md font-bold text-left sm:text-xl">{post.game}</h2>
+                                    <span className="text-sm mx-1">{formatDate(post.createdAt)}</span>
                                 </div>
                     
                                 {/* Post Creator and Platforms */}
-                                <div className="flex justify-between items-center text-sm mb-4">
+                                <div className="flex justify-between items-center text-sm sm:text-lg mb-4">
                                     <span>{post.creator}</span>
                                     <span>{post.platforms.join(', ')}</span>
                                 </div>
                     
                                 {/* Description */}
-                                <h2 className="text-xl font-bold mb-2">{post.description}</h2>
+                                <h2 className="text-md sm:text-xl mb-2">{post.description}</h2>
                     
                                 <MessageModal conversationId={post.conversationId} />
 
                                 <button
-                                    className="ml-5 w-40  py-2 px-6 mt-4 bg-red-600 hover:bg-red-700 text-white rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                                    className="mx-5 w-40  py-2 px-6 mt-4 bg-red-600 hover:bg-red-700 text-white rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-red-500"
                                     onClick={() => {handleDelete(post.postId, post.conversationId)}}
                                     disabled={isDeletingConversation}
                                 >
                                     Delete
                                 </button>
                             </li>
-                          ))}
+                        ))}
                         </ul>
             ) : (
                 <p>
@@ -85,6 +86,8 @@ const AcceptedPosts = () => {
                 </p>
             )}
         </div>
+    </div>
+    
   )
 }
 
