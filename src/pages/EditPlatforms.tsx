@@ -68,6 +68,12 @@ const EditPlatforms = () => {
                 >
                     Submit
                 </button>
+                <button
+                    onClick={() => navigate("/profile")}
+                    className="mt-4 w-full py-2 px-4 bg-red-600 hover:bg-red-700 rounded-lg text-white font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                >
+                    Cancel
+                </button>
             </div>
         </div>
     );
