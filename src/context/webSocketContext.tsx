@@ -10,7 +10,7 @@ interface WebSocketProviderProps {
 
 export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }) => {
     const [ws, setWs] = useState<WebSocket | null>(null);
-    const [newMessage, setNewMessage] = useState<boolean>(false);
+    const [newMessage, setNewMessage] = useState<number>(0);
     const [subscribedConversations, setSubscribedConversations] = useState<Set<number>>(new Set());
     const { isAuthenticated } = useUserContext();
 
@@ -46,7 +46,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
                 const message = JSON.parse(event.data);
                 console.log("message received");
                 localStorage.setItem(`newMessageNotification_${message.conversationId}`, "true");
-                setNewMessage(true);
+                setNewMessage(prev => prev + 1);
                 console.log("NewMessage");
             }
     

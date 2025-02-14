@@ -17,8 +17,8 @@ export type UserType = {
 
 export type WebSocketContextType = {
     ws: WebSocket | null;
-    newMessage: boolean;
-    setNewMessage: React.Dispatch<React.SetStateAction<boolean>>;
+    newMessage: number;
+    setNewMessage: React.Dispatch<React.SetStateAction<number>>;
     subscribedConversations: Set<number>;
     subscribeToConversation: (conversationId: number) => void;
     unsubscribeFromConversation: (conversationId: number) => void;

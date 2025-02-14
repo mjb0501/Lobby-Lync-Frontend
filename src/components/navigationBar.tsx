@@ -13,7 +13,7 @@ export const NavBar = () => {
                 </div> */}
 
                 {/* Navigation Links */}
-                <div className="space-x-6 flex items-center justify-between w-full">
+                <div className="space-x-6 flex items-center justify-end w-full">
                     {/* Links for unauthenticated users */}
                     {!isAuthenticated ? (
                         <>

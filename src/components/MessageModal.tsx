@@ -28,20 +28,26 @@ export const MessageModal: React.FC<MessageModalProps> = ({ conversationId }) =>
         setReceived, subscribedConversations, subscribeToConversation} = useWebSocket();
 
     useEffect(() => {
-        const storedMessageStatus = localStorage.getItem(`newMessageNotification_${conversationId}`)
+        //checks to see if specific conversation has received a message via localstorage
+        const storedMessageStatus = localStorage.getItem(`newMessageNotification_${conversationId}`);
+        //if it has received a message open message modal button will change to reflect new message
+        //messages will be refetched so that they are up to date
         if (storedMessageStatus === "true") {
             setMessageReceived(true);
+            console.log("I ran here");
             refetch();
         }
 
-        console.log("NewMessage:", received);
-        
+    }, [conversationId, refetch, received]);
+
+    useEffect(() => {
         if (ws) {
+            //if the user is for some reason not yet subscribed to the conversation they will be subscribed
             if (!subscribedConversations.has(conversationId)) {
                 subscribeToConversation(conversationId);
             }
         }
-    }, [ws, conversationId, refetch, received, subscribeToConversation, subscribedConversations]);
+    }, [ws, subscribedConversations, subscribeToConversation, conversationId]);
 
     useEffect(() => {
         if (messagesEndRef.current) {
@@ -49,9 +55,9 @@ export const MessageModal: React.FC<MessageModalProps> = ({ conversationId }) =>
         }
     }, [isModalOpen, messages]);
 
-
     const sendMessage = async (message: string) => {
         try {
+            //send a message through the web socket
             if (ws) {
                 ws.send(JSON.stringify({
                     type: 'message',
@@ -60,8 +66,8 @@ export const MessageModal: React.FC<MessageModalProps> = ({ conversationId }) =>
                     senderId: user.id,
                 }))
             }
+            //reset the message text area
             setNewMessage('');
-            refetch();
         } catch (error) {
             console.log(error);
         }
@@ -77,7 +83,7 @@ export const MessageModal: React.FC<MessageModalProps> = ({ conversationId }) =>
                     setIsModalOpen(true);
                     setMessageReceived(false)
                     localStorage.setItem(`newMessageNotification_${conversationId}`, "false");
-                    setReceived(false);
+                    setReceived(0);
                 }}
             >
                 { !messageReceived ? 'Open Messages' : 'New Message' }
