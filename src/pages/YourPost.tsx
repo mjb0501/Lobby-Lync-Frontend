@@ -92,7 +92,7 @@ const YourPost = () => {
                             post.acceptances.map((acceptance: Acceptance) => (
                                 <li key={acceptance.username} className="bg-gray-700 p-4 rounded-lg">
                                     <p className="sm:text-lg"><strong>Username:</strong> {acceptance.username}</p>
-                                    <p className="mt-2 sm:text-lg"><strong>Description:</strong> {acceptance.description}</p>
+                                    <p className="mt-2 sm:text-lg"><strong>Description:</strong> {acceptance.description.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</p>
                                     <p className="mt-2 sm:text-lg"><strong>ConversationId:</strong> {acceptance.conversationId}</p>
                                     {acceptance.platformUsername ? (
                                         <p className="mt-2 sm:text-lg"><strong>{acceptance.platform}:</strong> {acceptance.platformUsername}</p>
@@ -100,7 +100,7 @@ const YourPost = () => {
                                         <p className="mt-2 text-lg"><strong>Platform:</strong> {acceptance.platform}</p>
                                     )}
                                     
-                                    <MessageModal conversationId={acceptance.conversationId} />
+                                    <MessageModal conversationId={acceptance.conversationId} conversationType="yourPost" />
 
                                     <button
                                         className="mx-5 w-40 py-2 px-6 mt-4 bg-red-600 hover:bg-red-700 text-white rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-red-500"

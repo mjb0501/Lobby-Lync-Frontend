@@ -51,22 +51,17 @@ const Posts = () => {
     if (!isLoadingFetch) {
       setPosts(fetchedPosts.posts)
     }
-    console.log(fetchedPosts)
   }, [fetchedPosts, isLoadingFetch])
 
   if (isLoadingFetch || isLoadingAcceptedPosts) return <p>Loading...</p>
 
   const handleNextPage = () => {
-    console.log("Ran next")
-    console.log(posts[0])
     if (posts && posts.length === limit) {
       setPage(prev => prev + 1);
     }
-    console.log(page);
   };
 
   const handlePreviousPage = () => {
-    console.log("Ran previous")
     if (page > 1) {
       setPage(prev => prev - 1);
     }
@@ -189,7 +184,7 @@ const Posts = () => {
                 </div>
 
                 {/* Description */}
-                <h2 className="text-md sm:text-xl mb-2">{post.description}</h2>
+                <h2 className="text-md sm:text-xl mb-2">{post.description.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</h2>
 
                 <button
                   className={`btn mt-4 ${isPostAccepted ? 'bg-gray-700 cursor-not-allowed' : 'btn-primary'}`}

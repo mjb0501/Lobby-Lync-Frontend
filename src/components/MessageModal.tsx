@@ -13,32 +13,33 @@ interface Message {
 
 type MessageModalProps = {
     conversationId: number;
+    conversationType: 'yourPost' | 'acceptedPosts'
 };
 
-export const MessageModal: React.FC<MessageModalProps> = ({ conversationId }) => {
+export const MessageModal: React.FC<MessageModalProps> = ({ conversationId,  conversationType}) => {
     const { data: messages, isLoading: isFetchingMessages, refetch } = useGetMessages(conversationId);
     // const { mutateAsync: sendNewMessage, isLoading: isSendingMessage } = useSendMessage();
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
     const [newMessage, setNewMessage] = useState<string>('');
     const { user } = useUserContext();
     const messagesEndRef = useRef<HTMLDivElement>(null);
-    const [messageReceived, setMessageReceived] = useState<boolean>(false);
+    const [messagesReceived, setMessagesReceived] = useState<number>(0);
 
     const {ws, newMessage: received, setNewMessage: 
         setReceived, subscribedConversations, subscribeToConversation} = useWebSocket();
 
     useEffect(() => {
         //checks to see if specific conversation has received a message via localstorage
-        const storedMessageStatus = localStorage.getItem(`newMessageNotification_${conversationId}`);
+        const storedMessageStatus = localStorage.getItem(`${conversationType}MessageNotifications_${conversationId}`) ?? '0';
         //if it has received a message open message modal button will change to reflect new message
         //messages will be refetched so that they are up to date
-        if (storedMessageStatus === "true") {
-            setMessageReceived(true);
+        if (Number(storedMessageStatus) > 0) {
+            setMessagesReceived(Number(storedMessageStatus));
             console.log("I ran here");
             refetch();
         }
 
-    }, [conversationId, refetch, received]);
+    }, [conversationId, conversationType, refetch, received]);
 
     useEffect(() => {
         if (ws) {
@@ -68,6 +69,7 @@ export const MessageModal: React.FC<MessageModalProps> = ({ conversationId }) =>
             }
             //reset the message text area
             setNewMessage('');
+            setTimeout(() => refetch(), 100);
         } catch (error) {
             console.log(error);
         }
@@ -78,15 +80,16 @@ export const MessageModal: React.FC<MessageModalProps> = ({ conversationId }) =>
     return (
         <>
             <button
-                className={`w-40 py-2 px-4 rounded-lg ${!messageReceived ? 'bg-green-500 hover:bg-green-600 text-white' : 'bg-yellow-500 hover:bg-yellow-600 text-white'}`}
+                className={`w-40 py-2 px-4 rounded-lg ${messagesReceived === 0 ? 'bg-green-500 hover:bg-green-600 text-white' : 'bg-yellow-500 hover:bg-yellow-600 text-white'}`}
                 onClick={() => {
                     setIsModalOpen(true);
-                    setMessageReceived(false)
-                    localStorage.setItem(`newMessageNotification_${conversationId}`, "false");
-                    setReceived(0);
+                    setMessagesReceived(0)
+                    const key = `${conversationType}MessageNotifications_${conversationId}`;
+                    setReceived(prev => prev - parseInt(localStorage.getItem(key) ?? '0'));
+                    localStorage.setItem(key, "0");
                 }}
             >
-                { !messageReceived ? 'Open Messages' : 'New Message' }
+                { messagesReceived === 0 ? 'Open Messages' : ` ${messagesReceived} New Messages` }
             </button>
 
             {isModalOpen && (
@@ -105,7 +108,7 @@ export const MessageModal: React.FC<MessageModalProps> = ({ conversationId }) =>
                                             ${msg.senderId === user.id ? 
                                             "bg-blue-400" : "bg-slate-400"}`}
                                     >
-                                        <strong>{msg.senderId === user.id ? 'You' : "Them"}:</strong> {msg.content}
+                                        <strong>{msg.senderId === user.id ? 'You' : "Them"}:</strong> {msg.content.replace(/</g, "&lt;").replace(/>/g, "&gt;")}
                                     </div>
                                 ))
                             ) : (
@@ -129,8 +132,6 @@ export const MessageModal: React.FC<MessageModalProps> = ({ conversationId }) =>
                                 className="bg-gray-400 px-4 py-2 rounded" 
                                 onClick={() => {
                                     setIsModalOpen(false);
-                                    setMessageReceived(false);
-                                    localStorage.setItem(`newMessageNotification_${conversationId}`, "false");
                                 }}
                             >
                                 Cancel

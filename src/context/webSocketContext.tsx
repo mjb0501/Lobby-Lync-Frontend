@@ -12,7 +12,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
     const [ws, setWs] = useState<WebSocket | null>(null);
     const [newMessage, setNewMessage] = useState<number>(0);
     const [subscribedConversations, setSubscribedConversations] = useState<Set<number>>(new Set());
-    const { isAuthenticated } = useUserContext();
+    const { user, isAuthenticated } = useUserContext();
 
     useEffect(() => {
 
@@ -44,10 +44,25 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
             //on message set new message to alert messageModal of incoming message
             socket.onmessage = (event) => {
                 const message = JSON.parse(event.data);
-                console.log("message received");
-                localStorage.setItem(`newMessageNotification_${message.conversationId}`, "true");
-                setNewMessage(prev => prev + 1);
-                console.log("NewMessage");
+                console.log("message received", message);
+
+                if (message.senderId !== user.id) {
+
+                    if (message.creatorId == user.id) {
+                        const key = `yourPostMessageNotifications_${message.conversationId}`;
+                        let currentCount = parseInt(localStorage.getItem(key) ?? '0', 10);
+                        currentCount++;
+                        localStorage.setItem(key, currentCount.toString());
+                    } else {
+                        const key = `acceptedPostsMessageNotifications_${message.conversationId}`;
+                        let currentCount = parseInt(localStorage.getItem(key) ?? '0', 10);
+                        currentCount++;
+                        localStorage.setItem(key, currentCount.toString());
+                    }
+                    
+                    setNewMessage(prev => prev + 1);
+                    console.log("NewMessage");
+                }
             }
     
             setWs(socket);
@@ -64,7 +79,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
                 socket.close();
             }
         };
-    }, [isAuthenticated]);
+    }, [isAuthenticated, user.id]);
 
     //subscribes the user to a conversation, used when a new conversation is started
     const subscribeToConversation = (conversationId: number) => {
