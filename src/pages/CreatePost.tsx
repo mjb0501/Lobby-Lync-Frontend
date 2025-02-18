@@ -6,6 +6,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import { useUserPost } from '../hooks/fetchUserPost';
 import { useCreatePost } from '../hooks/createUserPost';
 import { useDeletePost } from '../hooks/deleteUserPost';
+import { useGetGamePlatforms } from '../hooks/fetchGamePlatforms';
 
 interface Post {
     gameId: number;
@@ -22,12 +23,12 @@ const CreatePost = () => {
     const [preexistingPost, setPreexistingPost] = useState<boolean>(false);
     //Represents the user's chosen post attributes
     const [updatedPost, setUpdatedPost] = useState<Post>({ gameId: -1, gameName: '', platforms: [], description: '' });
-    //Is set to the platforms available for the chosen game
-    const [platforms, setPlatforms] = useState<string[]>([]);
     const [error, setError] = useState<string | null>(null);
     //Used to map out all the buttons
     const allPlatforms = ['Xbox', 'Playstation', 'Steam', 'Switch'];
     const navigate = useNavigate();
+
+    const { data: platformsData, isLoading: isLoadingPlatforms } = useGetGamePlatforms(updatedPost.gameName);
 
     useEffect(() => {
         if (currentPost) {
@@ -36,28 +37,33 @@ const CreatePost = () => {
                 gameId: currentPost.gameId || -1,
                 gameName: currentPost.game || '',
                 platforms: currentPost.platforms || [],
-                description: currentPost.description || ''
+                description: currentPost.description || '' 
             });
-            chooseGame(currentPost.game);
         }
     }, [currentPost]);
 
-    if (isLoadingFetch) return <p>Loading...</p>
+    useEffect(() => {
+        if (platformsData !== undefined && platformsData.gameId !== currentPost.gameId) {
+            console.log("PlatformsData:", platformsData)
+            setUpdatedPost((prevPost) => ({
+                ...prevPost,
+                platforms: platformsData ? platformsData.platforms : [],
+                gameId: platformsData ? platformsData.gameId : -1,
+            }));
+        }
+    }, [platformsData, currentPost])
+
+    if (isLoadingFetch || isLoadingPlatforms) return <p>Loading...</p>
+
+    //console.log("PlatformsData:", platformsData)
 
     //Called when a user chooses a game, sets the proper atttributes in post
     const chooseGame = async (game: string) => {
-        try {
-            const response: gamePlatformsData = await gamePlatforms(game);
-            setUpdatedPost((prevPost) => ({
-                ...prevPost,
-                gameId: response.gameId,
-                gameName: game,
-            }));
-            setPlatforms(response.platforms);
-        } catch (error) {
-            console.error("Error fetching platforms: ", error)
-        }
-    };
+        setUpdatedPost((prevPost) => ({
+            ...prevPost,
+            gameName: game,
+        }));
+    }
 
     //Called when the user clears their game choice, removes game and platform attributes from post
     const clearGame = () => {
@@ -179,14 +185,14 @@ const CreatePost = () => {
                             key={platform}
                             onClick={() => togglePlatformSelection(platform)}
                             className={`w-full p-1 rounded-lg border transition-colors text-sm sm:text-md ${
-                                platforms.includes(platform)
+                                platformsData && platformsData.platforms.includes(platform)
                                     ? updatedPost.platforms.includes(platform) ? 'bg-green-600 text-white' : 'bg-blue-800'
                                     : 'bg-gray-600 text-gray-300'
                             } ${
-                                !platforms.includes(platform) && 'cursor-not-allowed'
+                                !platformsData?.platforms.includes(platform) && 'cursor-not-allowed'
                             }`}
                             //disable button if platform is not associated with game
-                            disabled={!platforms.includes(platform)}
+                            disabled={!platformsData?.platforms.includes(platform)}
                                     
                         >
                             {platform} {updatedPost.platforms.includes(platform) && '✓'}

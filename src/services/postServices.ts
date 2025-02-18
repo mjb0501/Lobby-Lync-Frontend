@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-export const getPosts = async (params: { gameName?: string | null, page?: number, limit?: number } = {}) => {
+export const getPosts = async (params: { gameName?: string | null, filteredPlatform?: string | null, page?: number, limit?: number } = {}) => {
     try {
         const response = await axios.get(`/posts/getPosts`, { params });
         return response.data;

@@ -17,7 +17,9 @@ export const autocompleteGames = async (search: string): Promise<string[]> => {
 
 export const gamePlatforms = async (game: string): Promise<gamePlatformsData> => {
     try {
+        console.log(game)
         const response = await axios.get(`/games/gamePlatforms?gameName=${game}`);
+        console.log(response.data)
         return response.data;
     } catch (error) {
         console.error('Error fetching platforms associated with game: ', error);

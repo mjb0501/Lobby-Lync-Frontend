@@ -7,6 +7,7 @@ import { useGetPosts } from '../hooks/fetchAllPosts';
 import { useGetAcceptedPosts } from '../hooks/fetchAcceptedPosts';
 import { useAcceptPost } from '../hooks/createPostAcceptance';
 import { useWebSocket } from '../context/webSocketContext';
+import useDebounce from '../hooks/debounce';
 
 interface Post {
   postId: number;
@@ -32,13 +33,16 @@ const Posts = () => {
   const limit = 10;
 
   const [gameName, setGameName] = useState<string | null>(null);
-  const { data: fetchedPosts, isLoading: isLoadingFetch } = useGetPosts(gameName, page, limit);
+  const [filteredPlatform, setFilteredPlatform] = useState<string | null>(null);
+  const debouncedFilteredPlatform = useDebounce(filteredPlatform, 500);
+  const { data: fetchedPosts, isLoading: isLoadingFetch } = useGetPosts(gameName, debouncedFilteredPlatform, page, limit);
   const { data: acceptedPosts, isLoading: isLoadingAcceptedPosts } = useGetAcceptedPosts();
   const { mutateAsync: acceptPost, isLoading: isLoadingAccept } = useAcceptPost();
   //used to check whether user is logged in
   const { user } = useUserContext();
   const { subscribeToConversation } = useWebSocket();
   const [posts, setPosts] = useState<Post[]>([]);
+  const platforms = ['Xbox', 'Playstation', 'Switch', 'Steam'];
 
   const [showModal, setShowModal] = useState<boolean>(false);
   const [description, setDescription] = useState<string>('');
@@ -52,6 +56,7 @@ const Posts = () => {
       setPosts(fetchedPosts.posts)
     }
   }, [fetchedPosts, isLoadingFetch])
+
 
   if (isLoadingFetch || isLoadingAcceptedPosts) return <p>Loading...</p>
 
@@ -144,20 +149,39 @@ const Posts = () => {
         pauseOnFocusLoss={false}
       />
 
+      {/* Welcome Text */}
       <h1 className='text-3xl font-bold mb-6 text-center'>
         {`Welcome ${user.username}!`}
       </h1>
       
+      {/* Game Filter */}
       <div className='mb-4'>
         <GameSearch filterByGame={filterByGame}/>
       </div>
       
+      {/* Chosen filtered game and game filter removal */}
       {gameName && (
         <div className='mb-4'>
           <p>Currently showing posts filtered by: <strong>{gameName}</strong></p>
-          <button className="btn btn-secondary mt-2" onClick={removeGameFilter}>Remove Filter</button>
+          <button className="btn btn-secondary mt-2" onClick={removeGameFilter}>Remove Game Filter</button>
         </div>
       )}
+
+      <div>
+        {platforms.map((platform) => (
+          <button
+            key={platform}
+            onClick={() => {setFilteredPlatform((prev) => prev === platform ? null : platform)}}
+            className={`w-auto mx-1 sm:mx-2 p-1 rounded-lg border transition-colors text-sm sm:text-lg ${
+              filteredPlatform === platform
+                ? 'bg-green-600 text-white' : 'bg-blue-800'}`
+            }
+            disabled={isLoadingFetch}
+          >
+            {platform} {filteredPlatform === platform && '✓'}
+          </button>
+        ))}
+      </div>
 
       {posts?.length > 0 ? (
         <ul className='space-y-6 flex flex-col items-center'>

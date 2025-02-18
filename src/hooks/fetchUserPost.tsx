@@ -6,7 +6,7 @@ export const useUserPost = () => {
     return useQuery({
         queryKey: [QUERY_KEYS.GET_USER_POSTS],
         queryFn: fetchUserPost,
-        staleTime: 1000 * 60 * 30,
-        retry: 2,
+        staleTime: Infinity,
+        cacheTime: 60 * 60 * 1000
     });
 };

@@ -6,5 +6,8 @@ export const useGetAcceptedPosts = () => {
     return useQuery({
         queryKey: [QUERY_KEYS.GET_ACCEPTED_POSTS],
         queryFn: getAcceptedPosts,
+        keepPreviousData: true,
+        staleTime: Infinity,
+        cacheTime: 60 * 60 * 1000,
     });
 };

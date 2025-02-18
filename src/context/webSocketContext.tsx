@@ -1,6 +1,8 @@
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { useUserContext } from './authContextProvider';
 import { WebSocketContextType } from '../types';
+import { useQueryClient } from 'react-query';
+import { QUERY_KEYS } from '../hooks/queryKeys';
 
 const WebSocketContext = createContext<WebSocketContextType | null>(null);
 
@@ -13,6 +15,8 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
     const [newMessage, setNewMessage] = useState<number>(0);
     const [subscribedConversations, setSubscribedConversations] = useState<Set<number>>(new Set());
     const { user, isAuthenticated } = useUserContext();
+
+    const queryClient = useQueryClient();
 
     useEffect(() => {
 
@@ -46,8 +50,12 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
                 const message = JSON.parse(event.data);
                 console.log("message received", message);
 
-                if (message.senderId !== user.id) {
+                queryClient.invalidateQueries({
+                    queryKey: [QUERY_KEYS.GET_MESSAGES, message.conversationId]
+                });
 
+
+                if (message.senderId !== user.id) {
                     if (message.creatorId == user.id) {
                         const key = `yourPostMessageNotifications_${message.conversationId}`;
                         let currentCount = parseInt(localStorage.getItem(key) ?? '0', 10);
@@ -79,7 +87,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
                 socket.close();
             }
         };
-    }, [isAuthenticated, user.id]);
+    }, [isAuthenticated, user.id, queryClient]);
 
     //subscribes the user to a conversation, used when a new conversation is started
     const subscribeToConversation = (conversationId: number) => {
