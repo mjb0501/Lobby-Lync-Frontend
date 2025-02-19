@@ -50,11 +50,11 @@ export const NavBar = () => {
                             <Link to="/createPost" className="hover:text-gray-400 transition-colors duration-300">Create Post</Link>
                             <Link to="/yourPost" className="hover:text-gray-400 transition-colors duration-300">
                                 Your Post
-                                <span className="top-0 right-0 bg-red-500 text-white text-xs rounded-full px-1.5">{yourPostNotifications}</span>
+                                {yourPostNotifications > 0 && <span className="top-0 right-0 bg-red-500 text-white text-xs rounded-full px-1.5">{yourPostNotifications}</span>}
                             </Link>
                             <Link to="/acceptedPosts" className="hover:text-gray-400 transition-colors duration-300">
                                 Accepted Posts
-                                <span className="top-0 right-0 bg-red-500 text-white text-xs rounded-full px-1.5">{acceptedPostsNotifications}</span>
+                                {acceptedPostsNotifications > 0 && <span className="top-0 right-0 bg-red-500 text-white text-xs rounded-full px-1.5">{acceptedPostsNotifications}</span>}
                             </Link>
                             <Link to="/profile" className="hover:text-gray-400 transition-colors duration-300">Profile</Link>
                             <button onClick={logout} className="bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-md transition-colors duration-300">Logout</button>

@@ -34,7 +34,7 @@ const Posts = () => {
 
   const [gameName, setGameName] = useState<string | null>(null);
   const [filteredPlatform, setFilteredPlatform] = useState<string | null>(null);
-  const debouncedFilteredPlatform = useDebounce(filteredPlatform, 500);
+  const debouncedFilteredPlatform = useDebounce(filteredPlatform, 1000);
   const { data: fetchedPosts, isLoading: isLoadingFetch } = useGetPosts(gameName, debouncedFilteredPlatform, page, limit);
   const { data: acceptedPosts, isLoading: isLoadingAcceptedPosts } = useGetAcceptedPosts();
   const { mutateAsync: acceptPost, isLoading: isLoadingAccept } = useAcceptPost();
@@ -168,6 +168,7 @@ const Posts = () => {
       )}
 
       <div>
+        <h3 className="text-xl font-semibold">Filter By Platform</h3>
         {platforms.map((platform) => (
           <button
             key={platform}

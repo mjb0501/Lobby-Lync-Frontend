@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GameSearch } from '../components/gameSearchBar';
-import { gamePlatforms, gamePlatformsData } from '../services/gameServices';
 import { ToastContainer, toast } from 'react-toastify';
 import { useUserPost } from '../hooks/fetchUserPost';
 import { useCreatePost } from '../hooks/createUserPost';
@@ -43,7 +42,7 @@ const CreatePost = () => {
     }, [currentPost]);
 
     useEffect(() => {
-        if (platformsData !== undefined && platformsData.gameId !== currentPost.gameId) {
+        if (platformsData !== undefined && platformsData.gameId !== currentPost?.gameId) {
             console.log("PlatformsData:", platformsData)
             setUpdatedPost((prevPost) => ({
                 ...prevPost,
@@ -73,7 +72,6 @@ const CreatePost = () => {
             gameName: '',
             platforms: [],
         }));
-        setPlatforms([]);
     };
 
     //Called when the user clicks a platform button, removes or adds the platform to the post attributes
@@ -116,10 +114,11 @@ const CreatePost = () => {
         setError(null);
 
         try {
-            let response = await createPost(postData);
+            
+            let response;
 
-            //if a response is already uploaded then prompt to replace with new post
-            if (!response.postId) {
+            //if a post already exists delete it and re upload it
+            if (currentPost?.gameId) {
                 try {
                     await deletePost();
                     response = await createPost(postData);
@@ -128,14 +127,22 @@ const CreatePost = () => {
                     toast.error('Failed to delete old post and upload new post', { toastId: '4'})
                     return;
                 }
+            } else {
+                try {
+                    response = await createPost(postData);
+                } catch (error) {
+                    console.error("Error while uploading new post:", error);
+                    toast.error('Failed to upload new post', { toastId: '5'})
+                    return;
+                }
             }
 
             console.log('Post created successfully:', response);
 
             setUpdatedPost({ gameId: -1, gameName: '', platforms: [], description: '' });
-            setPlatforms([]);
             navigate('/yourPost');
-        } catch {
+        } catch (error){
+            console.log(error)
             setError('Failed to create post. Please try again later.');
         }
         

@@ -48,7 +48,6 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
             //on message set new message to alert messageModal of incoming message
             socket.onmessage = (event) => {
                 const message = JSON.parse(event.data);
-                console.log("message received", message);
 
                 queryClient.invalidateQueries({
                     queryKey: [QUERY_KEYS.GET_MESSAGES, message.conversationId]
@@ -69,7 +68,6 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
                     }
                     
                     setNewMessage(prev => prev + 1);
-                    console.log("NewMessage");
                 }
             }
     

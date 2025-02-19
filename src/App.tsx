@@ -18,7 +18,6 @@ import AcceptedPosts from './pages/AcceptedPosts.tsx';
 import EditPost from './pages/EditPost.tsx';
 import { WebSocketProvider } from './context/webSocketContext.tsx';
 import Homepage from './pages/HomePage.tsx';
-import BottomNavBar from './components/bottomNavBar.tsx';
 
 axios.defaults.baseURL = 'http://localhost:3001';
 //console.log(process.env.REACT_APP_URL)

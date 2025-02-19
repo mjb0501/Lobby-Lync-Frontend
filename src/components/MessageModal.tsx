@@ -35,7 +35,6 @@ export const MessageModal: React.FC<MessageModalProps> = ({ conversationId,  con
         //messages will be refetched so that they are up to date
         if (Number(storedMessageStatus) > 0) {
             setMessagesReceived(Number(storedMessageStatus));
-            console.log("I ran here");
             refetch();
         }
 
