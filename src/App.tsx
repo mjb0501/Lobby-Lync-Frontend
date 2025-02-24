@@ -7,7 +7,7 @@ import Login from './pages/Login.tsx';
 import Posts from './pages/Posts.tsx';
 import CreatePost from './pages/CreatePost.tsx';
 import YourPost from './pages/YourPost.tsx';
-import { QueryClient, QueryClientProvider } from 'react-query';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 import './App.css'
 import Profile from './pages/Profile.tsx';
@@ -19,9 +19,16 @@ import EditPost from './pages/EditPost.tsx';
 import { WebSocketProvider } from './context/webSocketContext.tsx';
 import Homepage from './pages/HomePage.tsx';
 
-axios.defaults.baseURL = 'http://localhost:3001';
-//console.log(process.env.REACT_APP_URL)
+axios.defaults.baseURL = import.meta.env.VITE_NODE_ENV === 'production' ? import.meta.env.VITE_APP_API_URL : 'http://localhost:3001';
 axios.defaults.withCredentials = true;
+
+console.log("NODE_ENV:", import.meta.env.VITE_NODE_ENV);
+console.log("API_URL:", import.meta.env.VITE_APP_API_URL);
+console.log("Socket_URL:", import.meta.env.VITE_SOCKET_URL);
+
+if (import.meta.env.VITE_NODE_ENV === 'production') {
+  console.log('NODE ENV: production');
+}
 
 const queryClient = new QueryClient();
 

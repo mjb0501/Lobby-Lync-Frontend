@@ -10,6 +10,8 @@ const Login = () => {
   const navigate = useNavigate();
   const { checkAuthUser } = useUserContext();
 
+  console.log("Node ENV:", import.meta.env.VITE_NODE_ENV)
+
   //Will log the user in once valid credentials have been provided
   //NEED TO INCLUDE MORE COMPREHENSIVE FAILED LOGIN MESSAGES
   const handleLogin = async (e: React.FormEvent) => {

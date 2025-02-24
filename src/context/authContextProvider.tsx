@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState } from "react"
 import { getCurrentUser, logoutUser } from "../services/authServices";
 import { ContextType, UserType } from "../types";
 import { useNavigate } from "react-router-dom";
-import { useQueryClient } from "react-query";
+import { useQueryClient } from "@tanstack/react-query";
 
 export const INITIAL_USER = {
     id: '',

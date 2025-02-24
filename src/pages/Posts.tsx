@@ -37,7 +37,7 @@ const Posts = () => {
   const debouncedFilteredPlatform = useDebounce(filteredPlatform, 1000);
   const { data: fetchedPosts, isLoading: isLoadingFetch } = useGetPosts(gameName, debouncedFilteredPlatform, page, limit);
   const { data: acceptedPosts, isLoading: isLoadingAcceptedPosts } = useGetAcceptedPosts();
-  const { mutateAsync: acceptPost, isLoading: isLoadingAccept } = useAcceptPost();
+  const { mutateAsync: acceptPost, isPending: isLoadingAccept } = useAcceptPost();
   //used to check whether user is logged in
   const { user } = useUserContext();
   const { subscribeToConversation } = useWebSocket();

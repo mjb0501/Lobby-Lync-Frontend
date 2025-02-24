@@ -16,8 +16,8 @@ interface Post {
 
 const CreatePost = () => {
     const { data: currentPost, isLoading: isLoadingFetch } = useUserPost();
-    const { mutateAsync: createPost, isLoading: isLoadingCreate } = useCreatePost();
-    const { mutateAsync: deletePost, isLoading: isLoadingDelete } = useDeletePost();
+    const { mutateAsync: createPost, isPending: isLoadingCreate } = useCreatePost();
+    const { mutateAsync: deletePost, isPending: isLoadingDelete } = useDeletePost();
     //this state is used to track if the user has already created a post
     const [preexistingPost, setPreexistingPost] = useState<boolean>(false);
     //Represents the user's chosen post attributes

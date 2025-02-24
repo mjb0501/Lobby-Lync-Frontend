@@ -1,7 +1,7 @@
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { useUserContext } from './authContextProvider';
 import { WebSocketContextType } from '../types';
-import { useQueryClient } from 'react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { QUERY_KEYS } from '../hooks/queryKeys';
 
 const WebSocketContext = createContext<WebSocketContextType | null>(null);
@@ -78,7 +78,9 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
 
         if (!isAuthenticated) return;
 
-        const socket = start('ws://localhost:3001/ws');
+        const webSocketURL = import.meta.env.VITE_NODE_ENV === 'production' ? import.meta.env.VITE_SOCKET_URL : 'ws://localhost:3001/ws';
+
+        const socket = start(webSocketURL);
 
         return () => {
             if (socket.readyState === WebSocket.OPEN) {

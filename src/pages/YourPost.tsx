@@ -17,9 +17,9 @@ interface Acceptance {
 
 const YourPost = () => {
     const { data: post, isLoading: isLoadingFetch } = useUserPost();
-    const { mutateAsync: deletePost, isLoading: isLoadingDelete } = useDeletePost();
-    const { mutateAsync: rejectAcceptance, isLoading: isLoadingReject } = useDeleteAcceptAsCreator();
-    const { mutateAsync: deleteConversation, isLoading: isDeletingConversation } = useDeleteConversation();
+    const { mutateAsync: deletePost, isPending: isLoadingDelete } = useDeletePost();
+    const { mutateAsync: rejectAcceptance, isPending: isLoadingReject } = useDeleteAcceptAsCreator();
+    const { mutateAsync: deleteConversation, isPending: isDeletingConversation } = useDeleteConversation();
     const { unsubscribeFromConversation } = useWebSocket();
     const navigate = useNavigate();
 

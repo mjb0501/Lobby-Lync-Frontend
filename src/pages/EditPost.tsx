@@ -16,7 +16,7 @@ interface Post {
 
 const EditPost = () => {
     const { data: post, isLoading: isLoadingFetch, isError } = useUserPost();
-    const { mutateAsync: updatePost, isLoading: isLoadingUpdate } = useUpdatePost();
+    const { mutateAsync: updatePost, isPending: isLoadingUpdate } = useUpdatePost();
     //Represents the user's chosen post attributes
     const [updatedPost, setUpdatedPost] = useState<Post>({postId: -1, gameId: -1, gameName: '', platforms: [], description: ''});
     //Is set to the platforms available for the chosen game

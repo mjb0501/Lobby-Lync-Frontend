@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from "react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deleteConversation } from "../services/messageServices";
 import { QUERY_KEYS } from "./queryKeys";
 

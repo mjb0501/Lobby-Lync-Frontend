@@ -18,8 +18,8 @@ interface AcceptedPost {
 
 const AcceptedPosts = () => {
     const { data: acceptedPosts, isLoading: isLoadingAcceptPosts } = useGetAcceptedPosts();
-    const { mutateAsync: deletePostAcceptance, isLoading: isDeletingAccept } = useDeleteAccept();
-    const { mutateAsync: deleteConversation, isLoading: isDeletingConversation } = useDeleteConversation();
+    const { mutateAsync: deletePostAcceptance, isPending: isDeletingAccept } = useDeleteAccept();
+    const { mutateAsync: deleteConversation, isPending: isDeletingConversation } = useDeleteConversation();
     const { unsubscribeFromConversation } = useWebSocket(); 
 
     if (isLoadingAcceptPosts || isDeletingAccept) return <p>Loading...</p>
