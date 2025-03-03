@@ -19,16 +19,12 @@ import EditPost from './pages/EditPost.tsx';
 import { WebSocketProvider } from './context/webSocketContext.tsx';
 import Homepage from './pages/HomePage.tsx';
 
-axios.defaults.baseURL = import.meta.env.VITE_NODE_ENV === 'production' ? import.meta.env.VITE_APP_API_URL : 'http://localhost:3001';
+axios.defaults.baseURL = import.meta.env.VITE_NODE_ENV === 'production' ? import.meta.env.VITE_APP_API_URL : 'http://localhost:3001/api/';
 axios.defaults.withCredentials = true;
 
-console.log("NODE_ENV:", import.meta.env.VITE_NODE_ENV);
-console.log("API_URL:", import.meta.env.VITE_APP_API_URL);
-console.log("Socket_URL:", import.meta.env.VITE_SOCKET_URL);
-
-if (import.meta.env.VITE_NODE_ENV === 'production') {
-  console.log('NODE ENV: production');
-}
+// console.log("NODE_ENV:", import.meta.env.VITE_NODE_ENV);
+// console.log("API_URL:", import.meta.env.VITE_APP_API_URL);
+// console.log("Socket_URL:", import.meta.env.VITE_SOCKET_URL);
 
 const queryClient = new QueryClient();
 
