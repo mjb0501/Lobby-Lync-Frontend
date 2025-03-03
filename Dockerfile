@@ -19,11 +19,15 @@ ENV VITE_SOCKET_URL=$VITE_SOCKET_URL
 
 RUN npm run build
 
-FROM nginx:1.25.3-alpine-slim
+RUN mkdir -p /frontend-build && cp -r /app/dist/* /frontend-build/
 
-COPY --from=build /app/dist /usr/share/nginx/html
-COPY ./nginx.conf /etc/nginx/nginx.conf
+CMD ["echo", "Frontend build complete. Nginx will serve the files."]
 
-EXPOSE 80
+# FROM nginx:1.25.3-alpine-slim
 
-CMD ["nginx", "-g", "daemon off;"]
+# COPY --from=build /app/dist /usr/share/nginx/html
+# COPY ./nginx.conf /etc/nginx/nginx.conf
+
+# EXPOSE 80
+
+# CMD ["nginx", "-g", "daemon off;"]

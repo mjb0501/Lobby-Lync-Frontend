@@ -27,5 +27,6 @@ jobs:
             cd ./grouply/Grouply-Frontend
             git pull origin main
             docker-compose down
+            docker volume rm grouply_frontend_build
             docker-compose up --build -d
           EOF

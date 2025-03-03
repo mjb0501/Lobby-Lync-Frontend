@@ -58,7 +58,7 @@ export const MessageModal: React.FC<MessageModalProps> = ({ conversationId,  con
     const sendMessage = async (message: string) => {
         try {
             //send a message through the web socket
-            if (ws) {
+            if (ws?.readyState === WebSocket.OPEN) {
                 ws.send(JSON.stringify({
                     type: 'message',
                     conversationId,

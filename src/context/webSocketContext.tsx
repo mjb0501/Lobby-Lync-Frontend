@@ -91,7 +91,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
 
     //subscribes the user to a conversation, used when a new conversation is started
     const subscribeToConversation = (conversationId: number) => {
-        if (ws) {
+        if (ws?.readyState === WebSocket.OPEN) {
             ws.send(JSON.stringify({type: "subscribe", conversationId }));
             setSubscribedConversations((prev) => new Set([...prev, conversationId]));
         }
