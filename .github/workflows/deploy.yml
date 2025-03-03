@@ -25,6 +25,7 @@ jobs:
           ssh -i ~/.ssh/id_rsa root@142.93.195.49 << 'EOF'
             su - mjb0501
             cd ./grouply/Grouply-Frontend
+            git reset --hard origin/main
             git pull origin main
             docker-compose down
             docker volume rm grouply_frontend_build
