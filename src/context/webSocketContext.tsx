@@ -15,7 +15,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
     const [newMessage, setNewMessage] = useState<number>(0);
     const [subscribedConversations, setSubscribedConversations] = useState<Set<number>>(new Set());
     const { user, isAuthenticated } = useUserContext();
-    const [pendingMessages, setPendingMessages] = useState<string[]>([]);
+    const [, setPendingMessages] = useState<string[]>([]);
 
     const queryClient = useQueryClient();
 
