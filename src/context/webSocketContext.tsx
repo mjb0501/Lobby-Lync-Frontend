@@ -15,10 +15,12 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
     const [newMessage, setNewMessage] = useState<number>(0);
     const [subscribedConversations, setSubscribedConversations] = useState<Set<number>>(new Set());
     const { user, isAuthenticated } = useUserContext();
+    const [pendingMessages, setPendingMessages] = useState<string[]>([]);
 
     const queryClient = useQueryClient();
 
     useEffect(() => {
+        if (!isAuthenticated) return;
 
         //starts the connection to the websocket and sets up its behavior
         function start(websocketServerLocation: string) {
@@ -27,6 +29,11 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
             //send a messages saying connection on opening the connection
             socket.onopen = () => {
                 console.log("WebSocket connected");
+                setPendingMessages((prev) => {
+                    prev.forEach((message) => socket.send(message));
+                    return [];
+                });
+                setPendingMessages([]);
             };
     
             //start a timeout that will reattempt to connect to the server every 5 seconds
@@ -76,8 +83,6 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
             return socket;
         }
 
-        if (!isAuthenticated) return;
-
         const webSocketURL = import.meta.env.VITE_NODE_ENV === 'production' ? import.meta.env.VITE_SOCKET_URL : 'ws://localhost:3001/ws';
 
         const socket = start(webSocketURL);
@@ -89,10 +94,20 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
         };
     }, [isAuthenticated, user.id, queryClient]);
 
+    const sendMessage = (message: object) => {
+        const messageStr = JSON.stringify(message);
+
+        if (ws?.readyState === WebSocket.OPEN) {
+            ws.send(messageStr);
+        } else {
+            setPendingMessages((prev) => [...prev, messageStr]);
+        }
+    }
+
     //subscribes the user to a conversation, used when a new conversation is started
     const subscribeToConversation = (conversationId: number) => {
         if (ws?.readyState === WebSocket.OPEN) {
-            ws.send(JSON.stringify({type: "subscribe", conversationId }));
+            sendMessage({ type: "subscribe", conversationId });
             setSubscribedConversations((prev) => new Set([...prev, conversationId]));
         }
     };
@@ -110,7 +125,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
     };
 
     return (
-        <WebSocketContext.Provider value={{ws, newMessage, setNewMessage, subscribedConversations, subscribeToConversation, unsubscribeFromConversation }}>
+        <WebSocketContext.Provider value={{ws, newMessage, setNewMessage, subscribedConversations, subscribeToConversation, unsubscribeFromConversation, sendMessage }}>
             {children}
         </WebSocketContext.Provider>
     );

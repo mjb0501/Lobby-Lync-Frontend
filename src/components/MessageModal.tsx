@@ -26,7 +26,7 @@ export const MessageModal: React.FC<MessageModalProps> = ({ conversationId,  con
     const [messagesReceived, setMessagesReceived] = useState<number>(0);
 
     const {ws, newMessage: received, setNewMessage: 
-        setReceived, subscribedConversations, subscribeToConversation} = useWebSocket();
+        setReceived, subscribedConversations, subscribeToConversation, sendMessage: sendWSMessage} = useWebSocket();
 
     useEffect(() => {
         //checks to see if specific conversation has received a message via localstorage
@@ -58,14 +58,7 @@ export const MessageModal: React.FC<MessageModalProps> = ({ conversationId,  con
     const sendMessage = async (message: string) => {
         try {
             //send a message through the web socket
-            if (ws?.readyState === WebSocket.OPEN) {
-                ws.send(JSON.stringify({
-                    type: 'message',
-                    conversationId,
-                    content: message,
-                    senderId: user.id,
-                }))
-            }
+            sendWSMessage({type: 'message', conversationId, content: message, senderId: user.id});
             //reset the message text area
             setNewMessage('');
             setTimeout(() => refetch(), 100);

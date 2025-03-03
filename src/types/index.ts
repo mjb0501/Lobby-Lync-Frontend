@@ -22,4 +22,5 @@ export type WebSocketContextType = {
     subscribedConversations: Set<number>;
     subscribeToConversation: (conversationId: number) => void;
     unsubscribeFromConversation: (conversationId: number) => void;
+    sendMessage: (message: object) => void;
 }

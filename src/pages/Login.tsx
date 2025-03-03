@@ -10,8 +10,6 @@ const Login = () => {
   const navigate = useNavigate();
   const { checkAuthUser } = useUserContext();
 
-  console.log("Node ENV:", import.meta.env.VITE_NODE_ENV)
-
   //Will log the user in once valid credentials have been provided
   //NEED TO INCLUDE MORE COMPREHENSIVE FAILED LOGIN MESSAGES
   const handleLogin = async (e: React.FormEvent) => {
@@ -48,6 +46,7 @@ const Login = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              autoComplete='email'
               className="w-full px-4 py-2 rounded-lg bg-slate-400 border border-slate-300 text-slate-100 placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
