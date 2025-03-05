@@ -38,7 +38,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
     
             //start a timeout that will reattempt to connect to the server every 5 seconds
             socket.onclose = () => {
-                if (!isAuthenticated) {
+                if (isAuthenticated) {
                     setTimeout(function(){start(websocketServerLocation); console.log('attempt')}, 5000);
                     console.log("Attempted reconnection");
                 } else {
