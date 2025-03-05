@@ -41,7 +41,7 @@ const EditPlatforms = () => {
 
 
     return (
-        <div className="flex flex-col items-center">
+        <div className="flex flex-col items-center mb-28">
             <div className="bg-slate-500 rounded-lg shadow-lg p-8 w-full max-w-md">
                 <h2 className="text-2xl font-semibold text-slate-50 mb-6 text-center">Enter Your Platform Usernames</h2>
                 {Object.keys(usernames).map((platform) => (

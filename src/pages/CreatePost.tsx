@@ -149,7 +149,7 @@ const CreatePost = () => {
     }
 
     return (
-        <div className="bg-slate-600 text-white flex flex-col items-center py-8">
+        <div className="bg-slate-600 text-white flex flex-col items-center mb-28">
                     
             <ToastContainer 
                 position="top-center"
@@ -158,7 +158,7 @@ const CreatePost = () => {
             />
 
             {/* Game and Platform Selection*/}
-            <div className="w-full max-w-4xl mt-8 bg-slate-500 p-6 rounded-lg shadow-lg">
+            <div className="w-full max-w-4xl mt-6 bg-slate-500 p-6 rounded-lg shadow-lg">
 
                 { preexistingPost ? (
                     <div className="bg-red-500 rounded-lg">

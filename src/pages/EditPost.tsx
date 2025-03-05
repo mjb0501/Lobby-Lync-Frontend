@@ -128,7 +128,7 @@ const EditPost = () => {
     }
 
     return (
-        <div className="bg-slate-600 text-white flex flex-col items-center py-8">
+        <div className="bg-slate-600 text-white flex flex-col items-center mb-28">
 
             <ToastContainer
                 position="top-center"

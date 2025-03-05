@@ -141,7 +141,7 @@ const Posts = () => {
   };
 
   return (
-    <div className='container mx-auto max-w-7xl'>
+    <div className='container mx-auto max-w-7xl mb-28'>
       {/* Allows toast to show up. */}
       <ToastContainer 
         position="top-center"

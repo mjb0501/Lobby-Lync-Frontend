@@ -37,7 +37,7 @@ const AcceptedPosts = () => {
     }
 
   return (
-    <div className="container mx-auto max-w-7xl">
+    <div className="container mx-auto max-w-7xl mb-28">
         <div className="space-y-6 flex flex-col items-center">
 
         <ToastContainer 

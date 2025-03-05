@@ -48,7 +48,7 @@ const YourPost = () => {
     
     //bg-slate-600 text-white py-8 px-4
     return (
-        <div className="container mx-auto max-w-7xl mt-6">
+        <div className="container mx-auto max-w-7xl mt-6 mb-28">
             {post ? (
                 <div className="max-w-4xl mx-auto bg-slate-500 p-2 rounded-lg shadow-lg">
                     <h1 className="text-3xl font-semibold mb-4">Your Post</h1>
