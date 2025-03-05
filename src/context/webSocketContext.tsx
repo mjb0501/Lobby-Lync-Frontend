@@ -18,6 +18,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
     const [, setPendingMessages] = useState<string[]>([]);
 
     const queryClient = useQueryClient();
+    const userId = user.id;
 
     useEffect(() => {
         if (!isAuthenticated) return;
@@ -56,26 +57,39 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
             socket.onmessage = (event) => {
                 const message = JSON.parse(event.data);
 
-                queryClient.invalidateQueries({
-                    queryKey: [QUERY_KEYS.GET_MESSAGES, message.conversationId]
-                });
+                if (message.type === "refresh") {
+                    console.log('Refreshing conversation:', message.conversationId);
 
-
-                if (message.senderId !== user.id) {
-                    if (message.creatorId == user.id) {
-                        const key = `yourPostMessageNotifications_${message.conversationId}`;
-                        let currentCount = parseInt(localStorage.getItem(key) ?? '0', 10);
-                        currentCount++;
-                        localStorage.setItem(key, currentCount.toString());
-                    } else {
-                        const key = `acceptedPostsMessageNotifications_${message.conversationId}`;
-                        let currentCount = parseInt(localStorage.getItem(key) ?? '0', 10);
-                        currentCount++;
-                        localStorage.setItem(key, currentCount.toString());
+                    queryClient.invalidateQueries({
+                        queryKey: [QUERY_KEYS.GET_USER_POSTS]
+                    });
+                } else {
+                    queryClient.invalidateQueries({
+                        queryKey: [QUERY_KEYS.GET_MESSAGES, message.conversationId]
+                    });
+    
+    
+                    if (message.senderId !== userId) {
+                        if (message.creatorId == userId) {
+                            const key = `yourPostMessageNotifications_${message.conversationId}`;
+                            console.log("Received message for my post")
+                            queryClient.invalidateQueries({
+                                queryKey: [QUERY_KEYS.GET_USER_POSTS]
+                            })
+                            let currentCount = parseInt(localStorage.getItem(key) ?? '0', 10);
+                            currentCount++;
+                            localStorage.setItem(key, currentCount.toString());
+                        } else {
+                            const key = `acceptedPostsMessageNotifications_${message.conversationId}`;
+                            let currentCount = parseInt(localStorage.getItem(key) ?? '0', 10);
+                            currentCount++;
+                            localStorage.setItem(key, currentCount.toString());
+                        }
+                        
+                        setNewMessage(prev => prev + 1);
                     }
-                    
-                    setNewMessage(prev => prev + 1);
                 }
+
             }
     
             setWs(socket);
@@ -92,7 +106,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
                 socket.close();
             }
         };
-    }, [isAuthenticated, user.id, queryClient]);
+    }, [isAuthenticated, userId, queryClient]);
 
     const sendMessage = (message: object) => {
         const messageStr = JSON.stringify(message);
