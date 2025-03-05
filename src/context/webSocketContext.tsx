@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
+import { createContext, ReactNode, useContext, useEffect, useRef, useState } from 'react';
 import { useUserContext } from './authContextProvider';
 import { WebSocketContextType } from '../types';
 import { useQueryClient } from '@tanstack/react-query';
@@ -20,8 +20,13 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
     const queryClient = useQueryClient();
     const userId = user.id;
 
+    const shouldReconnect = useRef(true);
+
     useEffect(() => {
-        if (!isAuthenticated) return;
+        if (!isAuthenticated) {
+            shouldReconnect.current = false;
+            return;
+        }
 
         //starts the connection to the websocket and sets up its behavior
         function start(websocketServerLocation: string) {
@@ -39,7 +44,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
     
             //start a timeout that will reattempt to connect to the server every 5 seconds
             socket.onclose = () => {
-                if (isAuthenticated) {
+                if (isAuthenticated && shouldReconnect.current) {
                     setTimeout(function(){start(websocketServerLocation); console.log('attempt')}, 5000);
                     console.log("Attempted reconnection");
                 } else {
