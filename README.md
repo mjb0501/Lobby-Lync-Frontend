@@ -69,8 +69,8 @@ We welcome all ideas to help improve the user experience!
 ## 👤 Author
 
 **Marley**  
-🔗 [LinkedIn](https://www.linkedin.com/in/your-profile)  
-🐙 [GitHub](https://github.com/your-username)
+🔗 [LinkedIn](https://www.linkedin.com/in/marley-brandon/))  
+🐙 [GitHub](https://github.com/mjb0501)
 
 ---
 
