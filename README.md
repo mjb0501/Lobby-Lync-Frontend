@@ -37,26 +37,34 @@ This project was built entirely by myself over the course of several months.  Be
 
 ---
 
-## 🤝 Contributing
+## 🐛 Bug Reports
 
-Have a bug to report or a feature to suggest? Your feedback is welcome!
+Found a bug? Help us squash it!
 
-### 🐛 Report Bugs / 💡 Suggest Features
+1. [Open a bug issue](https://github.com/mjb0501/Lobby-Lync-Frontend/issues/new?labels=bug&template=bug-report---.md)
+2. Describe the problem clearly:
+   - What you expected to happen
+   - What actually happened
+   - Steps to reproduce the bug
+   - Screenshots or error logs (if applicable)
 
-1. [Open an issue](https://github.com/your-username/lobby-lync-frontend/issues)
-2. Choose the appropriate template (Bug Report or Feature Request)
-3. Provide as much detail as possible (screenshots, logs, expected behavior, etc.)
-
-### 🛠️ Want to Contribute Code?
-
-1. Fork the repo
-2. Create a new branch (`git checkout -b feature-name`)
-3. Make your changes
-4. Submit a pull request with a clear description
+Your feedback helps make Lobby Lync more stable and reliable!
 
 ---
 
-Thank you for helping make **Lobby Lync** better!
+## 💡 Feature Requests
+
+Have an idea for a new feature? We'd love to hear it!
+
+1. [Open a feature request](https://github.com/mjb0501/Lobby-Lync-Frontend/issues/new?labels=enhancement&template=feature-request---.md)
+2. Tell us:
+   - What the feature should do
+   - Why it would be useful
+   - Any potential challenges or notes
+
+We welcome all ideas to help improve the user experience!
+
+---
 
 ## 👤 Author
 
